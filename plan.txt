@@ -1,1 +1,36 @@
-Hardware component: USB to multiple SDI-12 terminals, labeled A, B, etc.
+Hardware component:
+    12 V battery to USB power supply and to SDI-12 terminals.
+    USB to multiple SDI-12 terminals, labeled A, B, etc.
+
+Main program:
+    Will probably need to be constantly running
+    Get settings from program or file.
+    Send the right signal to the right port at the right time
+    Receive responses; parse and record data
+    Transmit data via cell modem (or other method)
+
+Settings program or file:
+    For each SDI-12 port:
+        Enabled or disabled
+        Parameter name
+        Start time
+        Time interval
+        SDI-12 message
+        SDI-12 measurement to record (1st, 2nd, etc.)
+    Transmission settings (what time, etc.)
+    Consider a GUI written in HTML?
+
+SDI-12 program:
+    Transmit and receive SDI-12 signal (i.e. a USB to SDI-12 converter)
+    Can do instantaneous measurements
+
+Data temporary file:
+    Measurements are recorded here
+    Wiped with each transmission
+    
+Data backup file:
+    Data moved here when transmitted
+    Only wiped when disk space is low, or every X days
+    Could be stored on external drive
+    CSV file for each day
+
