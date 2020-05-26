@@ -1,0 +1,1 @@
+Hardware component: USB to multiple SDI-12 terminals, labeled A, B, etc.
