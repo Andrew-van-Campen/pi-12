@@ -18,7 +18,6 @@ Settings program or file:
         SDI-12 message
         SDI-12 measurement to record (1st, 2nd, etc.)
     Transmission settings (what time, etc.)
-    Consider a GUI written in HTML?
 
 SDI-12 program:
     Transmit and receive SDI-12 signal (i.e. a USB to SDI-12 converter)
@@ -28,7 +27,7 @@ Data temporary file:
     Measurements are recorded here
     Wiped with each transmission
     
-Data backup file:
+Data backup file(s):
     Data moved here when transmitted
     Only wiped when disk space is low, or every X days
     Could be stored on external drive
