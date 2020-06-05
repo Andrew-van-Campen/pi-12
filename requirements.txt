@@ -1,8 +1,0 @@
-- Operate on 12 V battery
-- Communicate with sensors using SDI-12
-- Obtain data from various analog sensors
-- Apply functions to data, such as slope and offset
-- Store data
-- Transmit via cell modem
-- Be easy to use and easy to troubleshoot in the field
-- Be weatherproof
