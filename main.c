@@ -17,12 +17,17 @@ int run()
 
 int main(int argc, char **argv)
 {
+    //Load settings.
+    load();
+
     //In the case of no command entered, ask for a command.
     if (argc == 1)
     {
         printf("No command entered. Type ./datalogger followed by a command.\n");
+        return 0;
     }
 
+    //Interpret command from user.
     if (strcmp(*(argv + 1), "run") == 0)
     {
         run();
