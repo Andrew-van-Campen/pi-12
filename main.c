@@ -1,5 +1,6 @@
 //This code handles most general datalogger functionality.
 
+#include "help.h"
 #include "settings.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -46,6 +47,10 @@ int main(int argc, char **argv)
         {
             printf("ERROR: Not a recognized setting.\n");
         }
+    }
+    else if (strcmp(*(argv + 1), "help") == 0)
+    {
+        help();
     }
     else
     {
