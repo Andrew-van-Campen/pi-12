@@ -15,7 +15,7 @@ int restore()
     fprintf(file, "MEAS1_NAME|MEAS1\n");
     fprintf(file, "MEAS1_COMMAND|0M!\n");
     fprintf(file, "MEAS1_POSITION|0\n");
-    fprintf(file, "MEAS1_TIME_INTERVAL|00:10:00\n");
+    fprintf(file, "MEAS1_TIME_INTERVAL|01:00:00\n");
     fprintf(file, "MEAS1_START_TIME|00:00:00\n");
     fclose(file);
     return 0;
@@ -186,10 +186,10 @@ int set(char *setting, char *value)
         }
         else
         {
-            printf("ERROR: Not a recognized setting.\n");
+            printf("ERROR: Not a valid setting.\n");
         }
     }
-    else
+    else //If not found...
     {
         printf("ERROR: Not a recognized setting.\n");
     }
