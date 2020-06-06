@@ -23,7 +23,7 @@ int main(int argc, char **argv)
     //In the case of no command entered, ask for a command.
     if (argc == 1)
     {
-        printf("No command entered. Type ./datalogger followed by a command.\n");
+        printf("No command entered. Type ./dl followed by a command.\n");
         return 0;
     }
 

@@ -1,6 +1,6 @@
-project: datalogger sdi-12
-datalogger: main.o settings.o
-	gcc -o datalogger main.o settings.o
+project: dl sdi-12
+dl: main.o settings.o
+	gcc -o dl main.o settings.o
 main.o: main.c
 	gcc -c main.c
 settings.o: settings.c
