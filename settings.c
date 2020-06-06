@@ -115,12 +115,79 @@ int set(char *setting, char *value)
             index++;
         }
     }
-    //If found, set and save.
+    //If found...
     if (found)
     {
-        //TODO: Check that the setting is valid.
-        *(values + index) = value;
-        save();
+        //Check that the setting is valid.
+        int valid = 0;
+        int check = index + 1;
+        if (check % 6 == 0 || check % 5 == 0) //START_TIME or TIME_INTERVAL
+        {
+            if (strlen(value) == 8)
+            {
+                if (*(value + 2) == ':' && *(value + 5) == ':')
+                {
+                    if (*(value + 0) - 48 >= 0 && *(value + 0) - 48 <= 2 &&
+                        *(value + 1) - 48 >= 0 && *(value + 1) - 48 <= 9 &&
+                        *(value + 3) - 48 >= 0 && *(value + 3) - 48 <= 5 &&
+                        *(value + 4) - 48 >= 0 && *(value + 4) - 48 <= 9 &&
+                        *(value + 6) - 48 >= 0 && *(value + 6) - 48 <= 5 &&
+                        *(value + 7) - 48 >= 0 && *(value + 7) - 48 <= 9)
+                    {
+                        valid = 1;
+                    }
+                }
+            }
+        }
+        else if (check % 4 == 0) //POSITION
+        {
+            if (strlen(value) == 1)
+            {
+                if (*(value + 0) - 48 >= 0 && *(value + 0) - 48 <= 9)
+                {
+                    valid = 1;
+                }
+            }
+        }
+        else if (check % 3 == 0) //COMMAND
+        {
+            if (strlen(value) >= 3 && strlen(value) <= 5)
+            {
+                if (*(value + 0) - 48 >= 0 && *(value + 0) - 48 <= 9 &&
+                    *(value + 1) >= 65 && *(value + 1) <= 90 &&
+                    *(value + strlen(value) - 1) == '!')
+                {
+                    valid = 1;
+                }
+            }
+        }
+        else if (check % 2 == 0) //NAME
+        {
+            if (strlen(value) <= 20)
+            {
+                valid = 1;
+            }
+        }
+        else //ENABLED
+        {
+            if (strlen(value) == 1)
+            {
+                if (*(value + 0) - 48 == 0 || *(value + 0) - 48 == 1)
+                {
+                    valid = 1;
+                }
+            }
+        }
+        //If valid, set and save.
+        if (valid)
+        {
+            *(values + index) = value;
+            save();
+        }
+        else
+        {
+            printf("ERROR: Not a recognized setting.\n");
+        }
     }
     else
     {
