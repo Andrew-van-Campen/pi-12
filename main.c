@@ -1,7 +1,6 @@
 //This code handles most general datalogger functionality.
 
 #include "command.h"
-#include "measurement.h"
 #include "settings.h"
 #include <time.h>
 

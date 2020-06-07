@@ -1,4 +1,4 @@
-#define num 3 //Number of possible measurements.
+#define num 10 //Number of possible measurements.
 
 struct measurement
 {
