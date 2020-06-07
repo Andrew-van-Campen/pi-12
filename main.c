@@ -2,14 +2,27 @@
 
 #include "command.h"
 #include "settings.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
 void run()
 {
+    time_t previous;
+    time_t current;
+    time(&current);
     while (1)
     {
+        previous = current;
+        while (current == previous)
+        {
+            time(&current);
+        }
+        for (int i = 0; i <= num - 1; i++)
+        {
+            if ((MEAS + i)->ENABLED &&
+                    (current - (MEAS + i)->start) % (MEAS + i)->interval == 0)
+            {
+                printf("%s\n", (MEAS + i)->NAME);
+            }
+        }
     }
 }
 

@@ -2,8 +2,6 @@
 
 #include "command.h"
 #include "settings.h"
-#include <stdio.h>
-#include <string.h>
 
 /*Take input from user; return an integer to main() function, indicating which function to run
   0 - do nothing (ERROR or invalid input)

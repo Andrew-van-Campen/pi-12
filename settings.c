@@ -1,9 +1,6 @@
 //This code handles settings.
 
 #include "settings.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 //Create a new settings file with default settings.
 void reset()
@@ -85,6 +82,22 @@ void load()
         *((MEAS + i)->START + pos) = '\0';
         pos = 0;
         c = fgetc(file);
+        //interval
+        (MEAS + i)->interval = 0;
+        (MEAS + i)->interval += (*((MEAS + i)->INTERVAL + 0) - 48) * 10 * 3600;
+        (MEAS + i)->interval += (*((MEAS + i)->INTERVAL + 1) - 48) * 1 * 3600;
+        (MEAS + i)->interval += (*((MEAS + i)->INTERVAL + 3) - 48) * 10 * 60;
+        (MEAS + i)->interval += (*((MEAS + i)->INTERVAL + 4) - 48) * 1 * 60;
+        (MEAS + i)->interval += (*((MEAS + i)->INTERVAL + 6) - 48) * 10;
+        (MEAS + i)->interval += (*((MEAS + i)->INTERVAL + 7) - 48) * 1;
+        //start
+        (MEAS + i)->start = 0;
+        (MEAS + i)->start += (*((MEAS + i)->START + 0) - 48) * 10 * 3600;
+        (MEAS + i)->start += (*((MEAS + i)->START + 1) - 48) * 1 * 3600;
+        (MEAS + i)->start += (*((MEAS + i)->START + 3) - 48) * 10 * 60;
+        (MEAS + i)->start += (*((MEAS + i)->START + 4) - 48) * 1 * 60;
+        (MEAS + i)->start += (*((MEAS + i)->START + 6) - 48) * 10;
+        (MEAS + i)->start += (*((MEAS + i)->START + 7) - 48) * 1;
     }
     fclose(file);
 }

@@ -1,3 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
 #define num 10 //Number of possible measurements.
 
 struct measurement
@@ -6,8 +11,10 @@ struct measurement
     char *NAME;
     char *COMMAND;
     int POSITION;
-    char *START;
     char *INTERVAL;
+    time_t interval;
+    char *START;
+    time_t start;
 };
 
 struct measurement *MEAS;
