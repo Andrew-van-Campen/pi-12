@@ -7,20 +7,28 @@ void run()
 {
     time_t previous;
     time_t current;
+    char *command;
     time(&current);
     while (1)
     {
         previous = current;
+        //Wait until time changes to check again.
         while (current == previous)
         {
             time(&current);
         }
+        //For each sensor that's enabled, check whether it's time to take a measurement.
         for (int i = 0; i <= num - 1; i++)
         {
             if ((MEAS + i)->ENABLED &&
                     (current - (MEAS + i)->start) % (MEAS + i)->interval == 0)
             {
-                printf("%s\n", (MEAS + i)->NAME);
+                //Send an SDI-12 command.
+                command = (char *) calloc(17, sizeof(char));
+                strcat(command, "./sdi-12 ");
+                strcat(command, (MEAS + 0)->COMMAND);
+                system(command);
+                free(command);
             }
         }
     }

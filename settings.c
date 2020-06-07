@@ -46,7 +46,7 @@ void load()
         pos = 0;
         c = fgetc(file);
         //COMMAND
-        (MEAS + i)->COMMAND = (char *) calloc(6, sizeof(char));
+        (MEAS + i)->COMMAND = (char *) calloc(9, sizeof(char));
         while (c != ' ')
         {
             *((MEAS + i)->COMMAND + pos) = c;
@@ -130,8 +130,8 @@ void view()
     printf("COMMAND     ");
     for (int i = 0; i <= num - 1; i++)
     {
-        printf("%s       ", (MEAS + i)->COMMAND);
-        for (int j = 1; j <= 5 - strlen((MEAS + i)->COMMAND); j++)
+        printf("%s    ", (MEAS + i)->COMMAND);
+        for (int j = 1; j <= 8 - strlen((MEAS + i)->COMMAND); j++)
         {
             printf(" ");
         }

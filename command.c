@@ -63,7 +63,7 @@ int command(int number, char **args)
         }
         else if (strcmp(*(args + 3), "COMMAND") == 0)
         {
-            if (strlen(*(args + 4)) > 5)
+            if (strlen(*(args + 4)) > 8)
             {
                 printf("ERROR: Invalid setting.\n");
                 return 0;
