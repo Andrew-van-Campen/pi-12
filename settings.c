@@ -5,193 +5,182 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define num 6 //Number of settings in total.
-
 //Create a new settings file with default settings.
-int restore()
+void reset()
 {
-    FILE *file = fopen(".datalogger-settings", "w");
-    fprintf(file, "MEAS1_ENABLED|0\n");
-    fprintf(file, "MEAS1_NAME|MEAS1\n");
-    fprintf(file, "MEAS1_COMMAND|0M!\n");
-    fprintf(file, "MEAS1_POSITION|0\n");
-    fprintf(file, "MEAS1_TIME_INTERVAL|01:00:00\n");
-    fprintf(file, "MEAS1_START_TIME|00:00:00\n");
+    FILE *file = fopen(".settings", "w");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        fprintf(file, "0 MEAS%d 0M! 0 01:00:00 00:00:00\n", i);
+    }
     fclose(file);
-    return 0;
 }
 
 //Load settings from file.
-int load()
+void load()
 {
+    //Allocate space in memory for settings.
+    MEAS = (struct measurement *) calloc(num, sizeof(struct measurement));
     //Create a settings file if one doesn't exist.
-    FILE *file = fopen(".datalogger-settings", "r");
+    FILE *file = fopen(".settings", "r");
     if (file == NULL)
     {
-        restore();
-        file = fopen(".datalogger-settings", "r");
+        reset();
+        file = fopen(".settings", "r");
     }
-    //Create arrays to hold settings and values.
-    settings = calloc(num, sizeof(char)*25);
-    for (int i = 0; i <= num - 1; i++)
-    {
-        *(settings + i) = calloc(25, sizeof(char));
-    }
-    values = calloc(num, sizeof(char)*25);
-    for (int i = 0; i <= num - 1; i++)
-    {
-        *(values + i) = calloc(25, sizeof(char));
-    }
-    //Read file and fill arrays.
+    //Read settings from file.
     char c = fgetc(file);
+    int pos = 0;
     for (int i = 0; i <= num - 1; i++)
     {
-        for (int j = 0; c != '|'; j++)
-        {
-            *(*(settings + i) + j) = c;
-            c = fgetc(file);
-        }
+        //ENABLED
+        (MEAS + i)->ENABLED = c - 48;
         c = fgetc(file);
-        for (int j = 0; c != '\n'; j++)
+        c = fgetc(file);
+        //NAME
+        (MEAS + i)->NAME = (char *) calloc(9, sizeof(char));
+        while (c != ' ')
         {
-            *(*(values + i) + j) = c;
+            *((MEAS + i)->NAME + pos) = c;
+            pos++;
             c = fgetc(file);
         }
+        *((MEAS + i)->NAME + pos) = '\0';
+        pos = 0;
+        c = fgetc(file);
+        //COMMAND
+        (MEAS + i)->COMMAND = (char *) calloc(6, sizeof(char));
+        while (c != ' ')
+        {
+            *((MEAS + i)->COMMAND + pos) = c;
+            pos++;
+            c = fgetc(file);
+        }
+        *((MEAS + i)->COMMAND + pos) = '\0';
+        pos = 0;
+        c = fgetc(file);
+        //POSITION
+        (MEAS + i)->POSITION = c - 48;
+        c = fgetc(file);
+        c = fgetc(file);
+        //INTERVAL
+        (MEAS + i)->INTERVAL = (char *) calloc(9, sizeof(char));
+        while (c != ' ')
+        {
+            *((MEAS + i)->INTERVAL + pos) = c;
+            pos++;
+            c = fgetc(file);
+        }
+        *((MEAS + i)->INTERVAL + pos) = '\0';
+        pos = 0;
+        c = fgetc(file);
+        //START
+        (MEAS + i)->START = (char *) calloc(9, sizeof(char));
+        while (c != '\n')
+        {
+            *((MEAS + i)->START + pos) = c;
+            pos++;
+            c = fgetc(file);
+        }
+        *((MEAS + i)->START + pos) = '\0';
+        pos = 0;
         c = fgetc(file);
     }
     fclose(file);
-    return 0;
-}
-
-//Save settings to file.
-int save()
-{
-    FILE *file = fopen(".datalogger-settings", "w");
-    for (int i = 0; i <= num - 1; i++)
-    {
-        fprintf(file, "%s|%s\n", *(settings + i), *(values + i));
-    }
-    fclose(file);
-    return 0;
 }
 
 //Print settings to the screen.
-int view()
+void view()
 {
-    FILE *file = fopen(".datalogger-settings", "r");
-    char c;
-    while (!feof(file))
+    printf("            ");
+    for (int i = 0; i <= num - 1; i++)
     {
-        c = getc(file);
-        if (c != EOF)
+        printf("MEAS%d       ", i);
+    }
+    printf("\n");
+    printf("ENABLED     ");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("%d           ", (MEAS + i)->ENABLED);
+    }
+    printf("\n");
+    printf("NAME        ");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("%s    ", (MEAS + i)->NAME);
+        for (int j = 1; j <= 8 - strlen((MEAS + i)->NAME); j++)
         {
-            putc(c, stdout);
+            printf(" ");
         }
     }
-    fclose(file);
-    return 0;
+    printf("\n");
+    printf("COMMAND     ");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("%s       ", (MEAS + i)->COMMAND);
+        for (int j = 1; j <= 5 - strlen((MEAS + i)->COMMAND); j++)
+        {
+            printf(" ");
+        }
+    }
+    printf("\n");
+    printf("POSITION    ");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("%d           ", (MEAS + i)->POSITION);
+    }
+    printf("\n");
+    printf("INTERVAL    ");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("%s    ", (MEAS + i)->INTERVAL);
+    }
+    printf("\n");
+    printf("START       ");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("%s    ", (MEAS + i)->START);
+    }
+    printf("\n");
 }
 
 //Change a setting.
-int set(char *setting, char *value)
+void set(char *label, char *setting, char *value)
 {
-    //Option to restore all settings to defaults.
-    if (strcmp(setting, "ALL") == 0 && strcmp(value, "DEFAULT") == 0)
+    //Change the setting.
+    int index = *(label + 4) - 48;
+    switch (*setting)
     {
-        restore();
-        return 0;
+        case 'E':
+            (MEAS + index)->ENABLED = *value - 48;
+            break;
+        case 'N':
+            (MEAS + index)->NAME = value;
+            break;
+        case 'C':
+            (MEAS + index)->COMMAND = value;
+            break;
+        case 'P':
+            (MEAS + index)->POSITION = *value - 48;
+            break;
+        case 'I':
+            (MEAS + index)->INTERVAL = value;
+            break;
+        case 'S':
+            (MEAS + index)->START = value;
+            break;
     }
-    //Search array for setting.
-    int found = 0;
-    int index = 0;
-    while (index <= num - 1 && !found)
+    //Save settings in file.
+    FILE *file = fopen(".settings", "w");
+    for (int i = 0; i <= num - 1; i++)
     {
-        if (strcmp(*(settings + index), setting) == 0)
-        {
-            found = 1;
-        }
-        else
-        {
-            index++;
-        }
+        fprintf(file, "%d %s %s %d %s %s\n",
+                (MEAS + i)->ENABLED,
+                (MEAS + i)->NAME,
+                (MEAS + i)->COMMAND,
+                (MEAS + i)->POSITION,
+                (MEAS + i)->INTERVAL,
+                (MEAS + i)->START);
     }
-    //If found...
-    if (found)
-    {
-        //Check that the setting is valid.
-        int valid = 0;
-        int check = index + 1;
-        if (check % 6 == 0 || check % 5 == 0) //START_TIME or TIME_INTERVAL
-        {
-            if (strlen(value) == 8)
-            {
-                if (*(value + 2) == ':' && *(value + 5) == ':')
-                {
-                    if (*(value + 0) - 48 >= 0 && *(value + 0) - 48 <= 2 &&
-                        *(value + 1) - 48 >= 0 && *(value + 1) - 48 <= 9 &&
-                        *(value + 3) - 48 >= 0 && *(value + 3) - 48 <= 5 &&
-                        *(value + 4) - 48 >= 0 && *(value + 4) - 48 <= 9 &&
-                        *(value + 6) - 48 >= 0 && *(value + 6) - 48 <= 5 &&
-                        *(value + 7) - 48 >= 0 && *(value + 7) - 48 <= 9)
-                    {
-                        valid = 1;
-                    }
-                }
-            }
-        }
-        else if (check % 4 == 0) //POSITION
-        {
-            if (strlen(value) == 1)
-            {
-                if (*(value + 0) - 48 >= 0 && *(value + 0) - 48 <= 9)
-                {
-                    valid = 1;
-                }
-            }
-        }
-        else if (check % 3 == 0) //COMMAND
-        {
-            if (strlen(value) >= 3 && strlen(value) <= 5)
-            {
-                if (*(value + 0) - 48 >= 0 && *(value + 0) - 48 <= 9 &&
-                    *(value + 1) >= 65 && *(value + 1) <= 90 &&
-                    *(value + strlen(value) - 1) == '!')
-                {
-                    valid = 1;
-                }
-            }
-        }
-        else if (check % 2 == 0) //NAME
-        {
-            if (strlen(value) <= 20)
-            {
-                valid = 1;
-            }
-        }
-        else //ENABLED
-        {
-            if (strlen(value) == 1)
-            {
-                if (*(value + 0) - 48 == 0 || *(value + 0) - 48 == 1)
-                {
-                    valid = 1;
-                }
-            }
-        }
-        //If valid, set and save.
-        if (valid)
-        {
-            *(values + index) = value;
-            save();
-        }
-        else
-        {
-            printf("ERROR: Not a valid setting.\n");
-        }
-    }
-    else //If not found...
-    {
-        printf("ERROR: Not a recognized setting.\n");
-    }
-    return 0;
+    fclose(file);
 }
