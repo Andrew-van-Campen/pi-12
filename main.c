@@ -2,13 +2,14 @@
 
 #include "command.h"
 #include "settings.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
 void run()
 {
     while (1)
     {
-
     }
 }
 
