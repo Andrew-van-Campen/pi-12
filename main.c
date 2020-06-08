@@ -29,6 +29,7 @@ void run()
                 strcat(command, (MEAS + 0)->COMMAND);
                 system(command);
                 free(command);
+                //TODO: Parse and save the response in data file.
             }
         }
     }
