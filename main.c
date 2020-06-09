@@ -25,7 +25,7 @@ void run()
             {
                 //Send an SDI-12 command.
                 command = (char *) calloc(17, sizeof(char));
-                strcat(command, "./sdi-12 ");
+                strcat(command, "./sdi12 ");
                 strcat(command, (MEAS + 0)->COMMAND);
                 system(command);
                 free(command);
