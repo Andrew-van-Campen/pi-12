@@ -4,7 +4,7 @@
 
 #include "command.h"
 #include "settings.h"
-#include "sdi-12.h"
+#include "sdi12.h"
 #include "data.h"
 
 //Main program.
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
     //Load settings.
     load();
     //Test serial port.
-    send("Hello");
+    test();
     //Interpret command from user.
     switch(command(argc, argv))
     {
