@@ -1,4 +1,4 @@
-project: datalogger sdi12
+project: datalogger
 datalogger: main.o command.o settings.o
 	gcc -o datalogger main.o command.o settings.o
 main.o: main.c command.h settings.h
@@ -7,5 +7,3 @@ command.o: command.c command.h settings.h
 	gcc -c command.c
 settings.o: settings.c settings.h
 	gcc -c settings.c
-sdi12: sdi12.c
-	gcc -o sdi12 sdi12.c

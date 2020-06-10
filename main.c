@@ -5,10 +5,33 @@
 
 void run()
 {
+    //Create variables to store time-related information.
     time_t previous;
     time_t current;
-    char *command;
+    struct tm *info;
+    //Create data file for the current month, if it doesn't already exist.
     time(&current);
+    info = localtime(&current);
+    char *filename = (char *) calloc(8, sizeof(char));
+    if (info->tm_mon > 9)
+    {
+        sprintf(filename, "%d-%d.csv", info->tm_year + 1900, info->tm_mon + 1);
+    }
+    else
+    {
+        sprintf(filename, "%d-0%d.csv", info->tm_year + 1900, info->tm_mon + 1);
+    }
+    FILE *file = fopen(filename, "r");
+    if (file == NULL)
+    {
+        file = fopen(filename, "w");
+        //Create a column for each sensor in the data file.
+    }
+    fclose(file);
+    //Create string to store measurements.
+    char *measurements;
+    //Execute loop endlessly.
+    /*
     while (1)
     {
         previous = current;
@@ -24,15 +47,12 @@ void run()
                     (current - (MEAS + i)->start) % (MEAS + i)->interval == 0)
             {
                 //Send an SDI-12 command.
-                command = (char *) calloc(17, sizeof(char));
-                strcat(command, "./sdi12 ");
-                strcat(command, (MEAS + 0)->COMMAND);
-                system(command);
-                free(command);
-                //TODO: Parse and save the response in data file.
+                //Parse and save measurements in data file.
+                measurements = "0+3.14+2.718+1.414";
             }
         }
     }
+    */
 }
 
 int main(int argc, char **argv)
