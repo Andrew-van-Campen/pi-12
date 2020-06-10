@@ -19,10 +19,10 @@ struct measurement
     time_t start;
 };
 
+//Array to store measurement settings.
 struct measurement *MEAS;
+//Name of serial port.
 char *port;
-
-//Variables to store time-related information.
-time_t previous;
+//Variables to store current time.
 time_t current;
 struct tm *info;

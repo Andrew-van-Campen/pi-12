@@ -1,11 +1,15 @@
 //This code handles writing data to the file.
 
-#include "data.h"
 #include "global.h"
-#include "settings.h"
+#include "data.h"
 
+//Create data file for the current month, if it doesn't already exist.
 void createFile()
 {
+    //Get current time.
+    time(&current);
+    info = localtime(&current);
+    //Assign file name based on current month.
     free(filename);
     filename = (char *) calloc(8, sizeof(char));
     if (info->tm_mon < 9)
@@ -16,7 +20,9 @@ void createFile()
     {
         sprintf(filename, "%d-%d.csv", info->tm_year + 1900, info->tm_mon + 1);
     }
+    //Attempt to open a file with that name.
     data_file = fopen(filename, "r");
+    //If the file doesn't exist, create one.
     if (data_file == NULL)
     {
         data_file = fopen(filename, "w");
@@ -34,6 +40,7 @@ void createFile()
     fclose(data_file);
 }
 
+//Write most recent measurements to file.
 void writeToFile()
 {
     //Write date and time.
@@ -64,6 +71,7 @@ void writeToFile()
         fprintf(data_file, "0");
     }
     fprintf(data_file, "%d,", info->tm_sec);
+    //TODO: Write measurements.
     fprintf(data_file, "\n");
     fclose(data_file);
 }

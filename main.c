@@ -1,20 +1,22 @@
 //This code handles most general datalogger functionality.
 
-#include "data.h"
 #include "global.h"
-#include "serial.h"
+
 #include "command.h"
 #include "settings.h"
+#include "sdi-12.h"
+#include "data.h"
 
-//Create data file for the current month, if it doesn't already exist.
+//Main program.
 void run()
 {
+    //Create data file if it doesn't already exist.
+    createFile();
+    //Get current time.
     time(&current);
     info = localtime(&current);
-    createFile();
-    //Create string to store measurements.
-    char *measurements;
     //Execute loop endlessly.
+    time_t previous;
     while (1)
     {
         previous = current;
@@ -37,8 +39,8 @@ void run()
             {
                 //Send an SDI-12 command.
                 //Parse measurements.
-                measurements = "0+3.14+2.718+1.414";
-                //TODO: Save measurements to data file.
+                //Save measurements to data file.
+                writeToFile();
             }
         }
     }
@@ -48,6 +50,7 @@ int main(int argc, char **argv)
 {
     //Load settings.
     load();
+    //Test serial port.
     send("Hello");
     //Interpret command from user.
     switch(command(argc, argv))
