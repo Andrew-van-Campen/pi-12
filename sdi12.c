@@ -1,7 +1,7 @@
 //This code handles communication with SDI-12 sensors.
 
 #include "global.h"
-#include "sdi-12.h"
+#include "sdi12.h"
 
 void test()
 {
