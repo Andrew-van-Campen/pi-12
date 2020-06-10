@@ -1,5 +1,6 @@
 //This code interprets commands from the user.
 
+#include "global.h"
 #include "command.h"
 #include "settings.h"
 

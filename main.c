@@ -1,47 +1,12 @@
 //This code handles most general datalogger functionality.
 
+#include "data.h"
+#include "global.h"
+#include "serial.h"
 #include "command.h"
 #include "settings.h"
 
-//Variables to store time-related information.
-time_t previous;
-time_t current;
-struct tm *info;
-//Pointer and name for file.
-FILE *file;
-char *filename;
-
 //Create data file for the current month, if it doesn't already exist.
-void createFile()
-{
-    free(filename);
-    filename = (char *) calloc(8, sizeof(char));
-    if (info->tm_mon < 9)
-    {
-        sprintf(filename, "%d-0%d.csv", info->tm_year + 1900, info->tm_mon + 1);
-    }
-    else
-    {
-        sprintf(filename, "%d-%d.csv", info->tm_year + 1900, info->tm_mon + 1);
-    }
-    file = fopen(filename, "r");
-    if (file == NULL)
-    {
-        file = fopen(filename, "w");
-        //Create a column in the data file for each measurement.
-        fprintf(file, ",,");
-        for (int i = 0; i <= num - 1; i++)
-        {
-            if ((MEAS + i)->ENABLED)
-            {
-                fprintf(file, "%s,", (MEAS + i)->NAME);
-            }
-        }
-        fprintf(file, "\n");
-    }
-    fclose(file);
-}
-
 void run()
 {
     time(&current);
@@ -73,37 +38,7 @@ void run()
                 //Send an SDI-12 command.
                 //Parse measurements.
                 measurements = "0+3.14+2.718+1.414";
-                //Write date and time.
-                file = fopen(filename, "a");
-                fprintf(file, "%d-", info->tm_year + 1900);
-                if (info->tm_mon < 9)
-                {
-                    fprintf(file, "0");
-                }
-                fprintf(file, "%d-", info->tm_mon + 1);
-                if (info->tm_mday < 10)
-                {
-                    fprintf(file, "0");
-                }
-                fprintf(file, "%d,", info->tm_mday);
-                if (info->tm_hour < 10)
-                {
-                    fprintf(file, "0");
-                }
-                fprintf(file, "%d:", info->tm_hour);
-                if (info->tm_min < 10)
-                {
-                    fprintf(file, "0");
-                }
-                fprintf(file, "%d:", info->tm_min);
-                if (info->tm_sec < 10)
-                {
-                    fprintf(file, "0");
-                }
-                fprintf(file, "%d,", info->tm_sec);
                 //TODO: Save measurements to data file.
-                fprintf(file, "\n");
-                fclose(file);
             }
         }
     }
@@ -113,6 +48,7 @@ int main(int argc, char **argv)
 {
     //Load settings.
     load();
+    send("Hello");
     //Interpret command from user.
     switch(command(argc, argv))
     {

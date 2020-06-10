@@ -1,0 +1,1 @@
+int send(char *string);

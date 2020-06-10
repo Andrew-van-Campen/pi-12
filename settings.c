@@ -1,90 +1,89 @@
 //This code handles settings.
 
+#include "global.h"
 #include "settings.h"
 
-//Pointer for file.
-FILE *file;
-
-//Create a new settings file with default settings.
+//Create a new settings settings_file with default settings.
 void reset()
 {
-    file = fopen(".settings", "w");
+    settings_file = fopen(".settings", "w");
     for (int i = 0; i <= num - 1; i++)
     {
-        fprintf(file, "0 MEAS%d 0M! 1 01:00:00 00:00:00\n", i);
+        fprintf(settings_file, "0 MEAS%d 0M! 1 01:00:00 00:00:00\n", i);
     }
-    fclose(file);
+    fclose(settings_file);
 }
 
 //Load settings from file.
 void load()
 {
+    port = "/dev/ttyACM0";
     //Allocate space in memory for settings.
     MEAS = (struct measurement *) calloc(num, sizeof(struct measurement));
     //Create a settings file if one doesn't exist.
-    file = fopen(".settings", "r");
-    if (file == NULL)
+    settings_file = fopen(".settings", "r");
+    if (settings_file == NULL)
     {
         reset();
-        file = fopen(".settings", "r");
+        settings_file = fopen(".settings", "r");
     }
     //Read settings from file.
-    char c = fgetc(file);
+    char c = fgetc(settings_file);
     int pos = 0;
     for (int i = 0; i <= num - 1; i++)
     {
         //ENABLED
         (MEAS + i)->ENABLED = c - 48;
-        c = fgetc(file);
-        c = fgetc(file);
+        c = fgetc(settings_file);
+        c = fgetc(settings_file);
         //NAME
         (MEAS + i)->NAME = (char *) calloc(9, sizeof(char));
         while (c != ' ')
         {
             *((MEAS + i)->NAME + pos) = c;
             pos++;
-            c = fgetc(file);
+            c = fgetc(settings_file);
         }
         *((MEAS + i)->NAME + pos) = '\0';
         pos = 0;
-        c = fgetc(file);
+        c = fgetc(settings_file);
         //COMMAND
         (MEAS + i)->COMMAND = (char *) calloc(9, sizeof(char));
         while (c != ' ')
         {
             *((MEAS + i)->COMMAND + pos) = c;
             pos++;
-            c = fgetc(file);
+            c = fgetc(settings_file);
         }
         *((MEAS + i)->COMMAND + pos) = '\0';
         pos = 0;
-        c = fgetc(file);
+        c = fgetc(settings_file);
         //MEASUREMENT
         (MEAS + i)->MEASUREMENT = c - 48;
-        c = fgetc(file);
-        c = fgetc(file);
+        c = fgetc(settings_file);
+        c = fgetc(settings_file);
         //INTERVAL
         (MEAS + i)->INTERVAL = (char *) calloc(9, sizeof(char));
         while (c != ' ')
         {
             *((MEAS + i)->INTERVAL + pos) = c;
             pos++;
-            c = fgetc(file);
+            c = fgetc(settings_file);
         }
         *((MEAS + i)->INTERVAL + pos) = '\0';
         pos = 0;
-        c = fgetc(file);
+        c = fgetc(settings_file);
         //START
         (MEAS + i)->START = (char *) calloc(9, sizeof(char));
         while (c != '\n')
         {
             *((MEAS + i)->START + pos) = c;
             pos++;
-            c = fgetc(file);
+            c = fgetc(settings_file);
         }
         *((MEAS + i)->START + pos) = '\0';
         pos = 0;
-        c = fgetc(file);
+        c = fgetc(settings_file);
         //interval
         (MEAS + i)->interval = 0;
         (MEAS + i)->interval += (*((MEAS + i)->INTERVAL + 0) - 48) * 10 * 3600;
@@ -102,7 +101,7 @@ void load()
         (MEAS + i)->start += (*((MEAS + i)->START + 6) - 48) * 10;
         (MEAS + i)->start += (*((MEAS + i)->START + 7) - 48) * 1;
     }
-    fclose(file);
+    fclose(settings_file);
 }
 
 //Print settings to the screen.
@@ -190,10 +189,10 @@ void set(char *label, char *setting, char *value)
         (MEAS + index)->START = value;
     }
     //Save settings in file.
-    file = fopen(".settings", "w");
+    settings_file = fopen(".settings", "w");
     for (int i = 0; i <= num - 1; i++)
     {
-        fprintf(file, "%d %s %s %d %s %s\n",
+        fprintf(settings_file, "%d %s %s %d %s %s\n",
                 (MEAS + i)->ENABLED,
                 (MEAS + i)->NAME,
                 (MEAS + i)->COMMAND,
@@ -201,5 +200,5 @@ void set(char *label, char *setting, char *value)
                 (MEAS + i)->INTERVAL,
                 (MEAS + i)->START);
     }
-    fclose(file);
+    fclose(settings_file);
 }
