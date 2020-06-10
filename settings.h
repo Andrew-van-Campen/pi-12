@@ -10,7 +10,7 @@ struct measurement
     int ENABLED;
     char *NAME;
     char *COMMAND;
-    int POSITION;
+    int MEASUREMENT;
     char *INTERVAL;
     time_t interval;
     char *START;

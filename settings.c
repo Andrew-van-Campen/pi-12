@@ -2,13 +2,16 @@
 
 #include "settings.h"
 
+//Pointer for file.
+FILE *file;
+
 //Create a new settings file with default settings.
 void reset()
 {
-    FILE *file = fopen(".settings", "w");
+    file = fopen(".settings", "w");
     for (int i = 0; i <= num - 1; i++)
     {
-        fprintf(file, "0 MEAS%d 0M! 0 01:00:00 00:00:00\n", i);
+        fprintf(file, "0 MEAS%d 0M! 1 01:00:00 00:00:00\n", i);
     }
     fclose(file);
 }
@@ -19,7 +22,7 @@ void load()
     //Allocate space in memory for settings.
     MEAS = (struct measurement *) calloc(num, sizeof(struct measurement));
     //Create a settings file if one doesn't exist.
-    FILE *file = fopen(".settings", "r");
+    file = fopen(".settings", "r");
     if (file == NULL)
     {
         reset();
@@ -56,8 +59,8 @@ void load()
         *((MEAS + i)->COMMAND + pos) = '\0';
         pos = 0;
         c = fgetc(file);
-        //POSITION
-        (MEAS + i)->POSITION = c - 48;
+        //MEASUREMENT
+        (MEAS + i)->MEASUREMENT = c - 48;
         c = fgetc(file);
         c = fgetc(file);
         //INTERVAL
@@ -105,19 +108,19 @@ void load()
 //Print settings to the screen.
 void view()
 {
-    printf("            ");
+    printf("               ");
     for (int i = 0; i <= num - 1; i++)
     {
         printf("MEAS%d       ", i);
     }
     printf("\n");
-    printf("ENABLED     ");
+    printf("ENABLED        ");
     for (int i = 0; i <= num - 1; i++)
     {
         printf("%d           ", (MEAS + i)->ENABLED);
     }
     printf("\n");
-    printf("NAME        ");
+    printf("NAME           ");
     for (int i = 0; i <= num - 1; i++)
     {
         printf("%s    ", (MEAS + i)->NAME);
@@ -127,7 +130,7 @@ void view()
         }
     }
     printf("\n");
-    printf("COMMAND     ");
+    printf("COMMAND        ");
     for (int i = 0; i <= num - 1; i++)
     {
         printf("%s    ", (MEAS + i)->COMMAND);
@@ -137,19 +140,19 @@ void view()
         }
     }
     printf("\n");
-    printf("POSITION    ");
+    printf("MEASUREMENT    ");
     for (int i = 0; i <= num - 1; i++)
     {
-        printf("%d           ", (MEAS + i)->POSITION);
+        printf("%d           ", (MEAS + i)->MEASUREMENT);
     }
     printf("\n");
-    printf("INTERVAL    ");
+    printf("INTERVAL       ");
     for (int i = 0; i <= num - 1; i++)
     {
         printf("%s    ", (MEAS + i)->INTERVAL);
     }
     printf("\n");
-    printf("START       ");
+    printf("START          ");
     for (int i = 0; i <= num - 1; i++)
     {
         printf("%s    ", (MEAS + i)->START);
@@ -162,36 +165,39 @@ void set(char *label, char *setting, char *value)
 {
     //Change the setting.
     int index = *(label + 4) - 48;
-    switch (*setting)
+    if (strcmp(setting, "ENABLED") == 0)
     {
-        case 'E':
-            (MEAS + index)->ENABLED = *value - 48;
-            break;
-        case 'N':
-            (MEAS + index)->NAME = value;
-            break;
-        case 'C':
-            (MEAS + index)->COMMAND = value;
-            break;
-        case 'P':
-            (MEAS + index)->POSITION = *value - 48;
-            break;
-        case 'I':
-            (MEAS + index)->INTERVAL = value;
-            break;
-        case 'S':
-            (MEAS + index)->START = value;
-            break;
+        (MEAS + index)->ENABLED = *value - 48;
+    }
+    else if (strcmp(setting, "NAME") == 0)
+    {
+        (MEAS + index)->NAME = value;
+    }
+    else if (strcmp(setting, "COMMAND") == 0)
+    {
+        (MEAS + index)->COMMAND = value;
+    }
+    else if (strcmp(setting, "MEASUREMENT") == 0)
+    {
+        (MEAS + index)->MEASUREMENT = *value - 48;
+    }
+    else if (strcmp(setting, "INTERVAL") == 0)
+    {
+        (MEAS + index)->INTERVAL = value;
+    }
+    else if (strcmp(setting, "START") == 0)
+    {
+        (MEAS + index)->START = value;
     }
     //Save settings in file.
-    FILE *file = fopen(".settings", "w");
+    file = fopen(".settings", "w");
     for (int i = 0; i <= num - 1; i++)
     {
         fprintf(file, "%d %s %s %d %s %s\n",
                 (MEAS + i)->ENABLED,
                 (MEAS + i)->NAME,
                 (MEAS + i)->COMMAND,
-                (MEAS + i)->POSITION,
+                (MEAS + i)->MEASUREMENT,
                 (MEAS + i)->INTERVAL,
                 (MEAS + i)->START);
     }

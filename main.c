@@ -3,35 +3,53 @@
 #include "command.h"
 #include "settings.h"
 
-void run()
+//Variables to store time-related information.
+time_t previous;
+time_t current;
+struct tm *info;
+//Pointer and name for file.
+FILE *file;
+char *filename;
+
+//Create data file for the current month, if it doesn't already exist.
+void createFile()
 {
-    //Create variables to store time-related information.
-    time_t previous;
-    time_t current;
-    struct tm *info;
-    //Create data file for the current month, if it doesn't already exist.
-    time(&current);
-    info = localtime(&current);
-    char *filename = (char *) calloc(8, sizeof(char));
-    if (info->tm_mon > 9)
-    {
-        sprintf(filename, "%d-%d.csv", info->tm_year + 1900, info->tm_mon + 1);
-    }
-    else
+    free(filename);
+    filename = (char *) calloc(8, sizeof(char));
+    if (info->tm_mon < 9)
     {
         sprintf(filename, "%d-0%d.csv", info->tm_year + 1900, info->tm_mon + 1);
     }
-    FILE *file = fopen(filename, "r");
+    else
+    {
+        sprintf(filename, "%d-%d.csv", info->tm_year + 1900, info->tm_mon + 1);
+    }
+    file = fopen(filename, "r");
     if (file == NULL)
     {
         file = fopen(filename, "w");
-        //Create a column for each sensor in the data file.
+        //Create a column in the data file for each measurement.
+        fprintf(file, ",,");
+        for (int i = 0; i <= num - 1; i++)
+        {
+            if ((MEAS + i)->ENABLED)
+            {
+                fprintf(file, "%s,", (MEAS + i)->NAME);
+            }
+        }
+        fprintf(file, "\n");
     }
     fclose(file);
+}
+
+void run()
+{
+    time(&current);
+    info = localtime(&current);
+    createFile();
     //Create string to store measurements.
     char *measurements;
     //Execute loop endlessly.
-    /*
     while (1)
     {
         previous = current;
@@ -40,6 +58,12 @@ void run()
         {
             time(&current);
         }
+        info = localtime(&current);
+        //If it's a new month, create a new data file.
+        if (info->tm_mday == 1 && info->tm_hour == 0 && info->tm_min == 0)
+        {
+            createFile();
+        }
         //For each sensor that's enabled, check whether it's time to take a measurement.
         for (int i = 0; i <= num - 1; i++)
         {
@@ -47,12 +71,42 @@ void run()
                     (current - (MEAS + i)->start) % (MEAS + i)->interval == 0)
             {
                 //Send an SDI-12 command.
-                //Parse and save measurements in data file.
+                //Parse measurements.
                 measurements = "0+3.14+2.718+1.414";
+                //Write date and time.
+                file = fopen(filename, "a");
+                fprintf(file, "%d-", info->tm_year + 1900);
+                if (info->tm_mon < 9)
+                {
+                    fprintf(file, "0");
+                }
+                fprintf(file, "%d-", info->tm_mon + 1);
+                if (info->tm_mday < 10)
+                {
+                    fprintf(file, "0");
+                }
+                fprintf(file, "%d,", info->tm_mday);
+                if (info->tm_hour < 10)
+                {
+                    fprintf(file, "0");
+                }
+                fprintf(file, "%d:", info->tm_hour);
+                if (info->tm_min < 10)
+                {
+                    fprintf(file, "0");
+                }
+                fprintf(file, "%d:", info->tm_min);
+                if (info->tm_sec < 10)
+                {
+                    fprintf(file, "0");
+                }
+                fprintf(file, "%d,", info->tm_sec);
+                //TODO: Save measurements to data file.
+                fprintf(file, "\n");
+                fclose(file);
             }
         }
     }
-    */
 }
 
 int main(int argc, char **argv)

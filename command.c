@@ -75,7 +75,7 @@ int command(int number, char **args)
                 return 0;
             }
         }
-        else if (strcmp(*(args + 3), "POSITION") == 0)
+        else if (strcmp(*(args + 3), "MEASUREMENT") == 0)
         {
             if (strlen(*(args + 4)) > 1)
             {
