@@ -20,7 +20,7 @@ void openPort()
     //Handle errors.
     if (port < 0)
     {
-        printf("ERROR: Could not open port %s.\n", port_name);
+        printf("ERROR: Could not open port %s\n", port_name);
         return;
     }
     //Create termios structure.
@@ -28,7 +28,7 @@ void openPort()
     //Read in existing settings, and handle errors.
     if (tcgetattr(port, &tty) != 0)
     {
-        printf("ERROR: %s.\n", strerror(errno));
+        printf("ERROR: %s\n", strerror(errno));
         return;
     }
     //Set control modes.

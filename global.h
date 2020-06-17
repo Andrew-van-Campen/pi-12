@@ -23,6 +23,8 @@ struct measurement
 
 //Array to store measurement settings.
 struct measurement *MEAS;
+//Path to save data files to.
+char *data_path;
 //Name of serial port.
 char *port_name;
 //Variables to store current time.

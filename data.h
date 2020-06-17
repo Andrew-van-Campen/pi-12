@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 FILE *data_file;
-char *filename;
+char *filepath;
 
-void createFile();
+int createFile();
 void writeToFile();

@@ -7,9 +7,10 @@
 void reset()
 {
     settings_file = fopen(".settings", "w");
+    fprintf(settings_file, ".|/dev/ttyACM0\n");
     for (int i = 0; i <= num - 1; i++)
     {
-        fprintf(settings_file, "0 MEAS%d 0M! 1 01:00:00 00:00:00\n", i);
+        fprintf(settings_file, "0|MEAS%d|0M!|1|01:00:00|00:00:00\n", i);
     }
     fclose(settings_file);
 }
@@ -17,9 +18,6 @@ void reset()
 //Load settings from file.
 void load()
 {
-    port_name = "/dev/ttyACM0";
-    //Allocate space in memory for settings.
-    MEAS = (struct measurement *) calloc(num, sizeof(struct measurement));
     //Create a settings file if one doesn't exist.
     settings_file = fopen(".settings", "r");
     if (settings_file == NULL)
@@ -30,6 +28,30 @@ void load()
     //Read settings from file.
     char c = fgetc(settings_file);
     int pos = 0;
+    //DATA
+    data_path = (char *) calloc(51, sizeof(char));
+    while (c != '|')
+    {
+        *(data_path + pos) = c;
+        pos++;
+        c = fgetc(settings_file);
+    }
+    *(data_path + pos) = '\0';
+    pos = 0;
+    c = fgetc(settings_file);
+    //PORT
+    port_name = (char *) calloc(13, sizeof(char));
+    while (c != '\n')
+    {
+        *(port_name + pos) = c;
+        pos++;
+        c = fgetc(settings_file);
+    }
+    *(port_name + pos) = '\0';
+    pos = 0;
+    c = fgetc(settings_file);
+    //Measurement settings
+    MEAS = (struct measurement *) calloc(num, sizeof(struct measurement));
     for (int i = 0; i <= num - 1; i++)
     {
         //ENABLED
@@ -38,7 +60,7 @@ void load()
         c = fgetc(settings_file);
         //NAME
         (MEAS + i)->NAME = (char *) calloc(9, sizeof(char));
-        while (c != ' ')
+        while (c != '|')
         {
             *((MEAS + i)->NAME + pos) = c;
             pos++;
@@ -49,7 +71,7 @@ void load()
         c = fgetc(settings_file);
         //COMMAND
         (MEAS + i)->COMMAND = (char *) calloc(9, sizeof(char));
-        while (c != ' ')
+        while (c != '|')
         {
             *((MEAS + i)->COMMAND + pos) = c;
             pos++;
@@ -64,7 +86,7 @@ void load()
         c = fgetc(settings_file);
         //INTERVAL
         (MEAS + i)->INTERVAL = (char *) calloc(9, sizeof(char));
-        while (c != ' ')
+        while (c != '|')
         {
             *((MEAS + i)->INTERVAL + pos) = c;
             pos++;
@@ -100,6 +122,26 @@ void load()
         (MEAS + i)->start += (*((MEAS + i)->START + 4) - 48) * 1 * 60;
         (MEAS + i)->start += (*((MEAS + i)->START + 6) - 48) * 10;
         (MEAS + i)->start += (*((MEAS + i)->START + 7) - 48) * 1;
+        //value
+        (MEAS + i)->value = "";
+    }
+    fclose(settings_file);
+}
+
+//Save settings in file.
+void save()
+{
+    settings_file = fopen(".settings", "w");
+    fprintf(settings_file, "%s|%s\n", data_path, port_name);
+    for (int i = 0; i <= num - 1; i++)
+    {
+        fprintf(settings_file, "%d|%s|%s|%d|%s|%s\n",
+                (MEAS + i)->ENABLED,
+                (MEAS + i)->NAME,
+                (MEAS + i)->COMMAND,
+                (MEAS + i)->MEASUREMENT,
+                (MEAS + i)->INTERVAL,
+                (MEAS + i)->START);
     }
     fclose(settings_file);
 }
@@ -107,18 +149,45 @@ void load()
 //Print settings to the screen.
 void view()
 {
+    printf("---------------");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("--------");
+        if (i < num - 1)
+        {
+            printf("----");
+        }
+    }
+    printf("\n");
+    //Data save path
+    printf("DATA           %s\n", data_path);
+    //Port name
+    printf("PORT           %s\n", port_name);
+    printf("---------------");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("--------");
+        if (i < num - 1)
+        {
+            printf("----");
+        }
+    }
+    printf("\n");
+    //Measurement labels
     printf("               ");
     for (int i = 0; i <= num - 1; i++)
     {
         printf("MEAS%d       ", i);
     }
     printf("\n");
+    //ENABLED
     printf("ENABLED        ");
     for (int i = 0; i <= num - 1; i++)
     {
         printf("%d           ", (MEAS + i)->ENABLED);
     }
     printf("\n");
+    //NAME
     printf("NAME           ");
     for (int i = 0; i <= num - 1; i++)
     {
@@ -129,6 +198,7 @@ void view()
         }
     }
     printf("\n");
+    //COMMAND
     printf("COMMAND        ");
     for (int i = 0; i <= num - 1; i++)
     {
@@ -139,30 +209,42 @@ void view()
         }
     }
     printf("\n");
+    //MEASUREMENT
     printf("MEASUREMENT    ");
     for (int i = 0; i <= num - 1; i++)
     {
         printf("%d           ", (MEAS + i)->MEASUREMENT);
     }
     printf("\n");
+    //INTERVAL
     printf("INTERVAL       ");
     for (int i = 0; i <= num - 1; i++)
     {
         printf("%s    ", (MEAS + i)->INTERVAL);
     }
     printf("\n");
+    //START
     printf("START          ");
     for (int i = 0; i <= num - 1; i++)
     {
         printf("%s    ", (MEAS + i)->START);
     }
     printf("\n");
+    printf("---------------");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("--------");
+        if (i < num - 1)
+        {
+            printf("----");
+        }
+    }
+    printf("\n");
 }
 
-//Change a setting.
-void set(char *label, char *setting, char *value)
+//Change a measurement setting.
+void setMeas(char *label, char *setting, char *value)
 {
-    //Change the setting.
     int index = *(label + 4) - 48;
     if (strcmp(setting, "ENABLED") == 0)
     {
@@ -188,17 +270,19 @@ void set(char *label, char *setting, char *value)
     {
         (MEAS + index)->START = value;
     }
-    //Save settings in file.
-    settings_file = fopen(".settings", "w");
-    for (int i = 0; i <= num - 1; i++)
-    {
-        fprintf(settings_file, "%d %s %s %d %s %s\n",
-                (MEAS + i)->ENABLED,
-                (MEAS + i)->NAME,
-                (MEAS + i)->COMMAND,
-                (MEAS + i)->MEASUREMENT,
-                (MEAS + i)->INTERVAL,
-                (MEAS + i)->START);
-    }
-    fclose(settings_file);
+    save();
+}
+
+//Set data path.
+void setData(char *string)
+{
+    data_path = string;
+    save();
+}
+
+//Set port name.
+void setPort(char *string)
+{
+    port_name = string;
+    save();
 }

@@ -4,28 +4,30 @@
 #include "data.h"
 
 //Create data file for the current month, if it doesn't already exist.
-void createFile()
+int createFile()
 {
-    //Get current time.
-    time(&current);
-    info = localtime(&current);
     //Assign file name based on current month.
-    free(filename);
-    filename = (char *) calloc(8, sizeof(char));
+    free(filepath);
+    filepath = (char *) calloc(60, sizeof(char));
     if (info->tm_mon < 9)
     {
-        sprintf(filename, "%d-0%d.csv", info->tm_year + 1900, info->tm_mon + 1);
+        sprintf(filepath, "%s/%d-0%d.csv", data_path, info->tm_year + 1900, info->tm_mon + 1);
     }
     else
     {
-        sprintf(filename, "%d-%d.csv", info->tm_year + 1900, info->tm_mon + 1);
+        sprintf(filepath, "%s/%d-%d.csv", data_path, info->tm_year + 1900, info->tm_mon + 1);
     }
     //Attempt to open a file with that name.
-    data_file = fopen(filename, "r");
+    data_file = fopen(filepath, "r");
     //If the file doesn't exist, create one.
     if (data_file == NULL)
     {
-        data_file = fopen(filename, "w");
+        data_file = fopen(filepath, "w");
+        if (data_file == NULL)
+        {
+            printf("ERROR: Could not access %s\n", data_path);
+            return -1;
+        }
         //Create a column for date & time.
         fprintf(data_file, "Date & Time,");
         //Create a column for each measurement.
@@ -38,14 +40,17 @@ void createFile()
         }
         fprintf(data_file, "\n");
     }
+    //Close the file.
     fclose(data_file);
+    return 0;
 }
 
 //Write most recent measurements to file.
 void writeToFile()
 {
+    //Open file.
+    data_file = fopen(filepath, "a");
     //Write date and time.
-    data_file = fopen(filename, "a");
     fprintf(data_file, "%d-", info->tm_year + 1900);
     if (info->tm_mon < 9)
     {
@@ -72,7 +77,15 @@ void writeToFile()
         fprintf(data_file, "0");
     }
     fprintf(data_file, "%d,", info->tm_sec);
-    //TODO: Write measurements.
+    //Write measurements.
+    for (int i = 0; i <= num - 1; i++)
+    {
+        if ((MEAS + i)->ENABLED)
+        {
+            fprintf(data_file, "%s,", (MEAS + i)->value);
+        }
+    }
     fprintf(data_file, "\n");
+    //Close the file.
     fclose(data_file);
 }

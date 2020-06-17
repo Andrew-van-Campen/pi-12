@@ -10,26 +10,26 @@
 //Main program.
 void run()
 {
-    //Create data file if it doesn't already exist.
-    createFile();
     //Get current time.
     time(&current);
     info = localtime(&current);
     //Execute loop endlessly.
     time_t previous;
+    int write;
     while (1)
     {
         previous = current;
-        //Wait until time changes to check again.
+        write = 0;
+        //Wait until time changes.
         while (current == previous)
         {
             time(&current);
         }
         info = localtime(&current);
-        //If it's a new month, create a new data file.
-        if (info->tm_mday == 1 && info->tm_hour == 0 && info->tm_min == 0)
+        //Create data file if it doesn't already exist.
+        if (createFile() == -1)
         {
-            createFile();
+            return;
         }
         //For each sensor that's enabled, check whether it's time to take a measurement.
         for (int i = 0; i <= num - 1; i++)
@@ -44,8 +44,19 @@ void run()
                 //If too few measurements, send aD1!, etc.
                 //Parse measurement.
                 (MEAS + i)->value = "78.826";
-                //Save measurements to data file.
-                writeToFile();
+                //Request write to file.
+                write = 1;
+            }
+        }
+        //Write to file if any measurements were taken.
+        if (write)
+        {
+            //Save measurements to data file.
+            writeToFile();
+            //Reset measurement values.
+            for (int i = 0; i <= num - 1; i++)
+            {
+                (MEAS + i)->value = "";
             }
         }
     }
@@ -57,7 +68,7 @@ int main(int argc, char **argv)
     load();
     //Test serial port.
     test();
-    //Interpret command from user.
+    //Interpret command from user and call the appropriate function.
     switch(command(argc, argv))
     {
         case 0:
@@ -69,11 +80,18 @@ int main(int argc, char **argv)
             view();
             break;
         case 3:
-            set(*(argv + 2), *(argv + 3), *(argv + 4));
-            break;
-        case 4:
             reset();
             break;
+        case 4:
+            setMeas(*(argv + 2), *(argv + 3), *(argv + 4));
+            break;
+        case 5:
+            setData(*(argv + 3));
+            break;
+        case 6:
+            setPort(*(argv + 3));
+            break;
     }
+    //Return.
     return 0;
 }
