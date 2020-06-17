@@ -6,7 +6,7 @@
 #include <time.h>
 
 //Maximum number of measurements.
-#define num 6
+#define num 10
 
 struct measurement
 {
