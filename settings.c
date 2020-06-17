@@ -17,7 +17,7 @@ void reset()
 //Load settings from file.
 void load()
 {
-    port_name = "/dev/ttyACM1";
+    port_name = "/dev/ttyACM0";
     //Allocate space in memory for settings.
     MEAS = (struct measurement *) calloc(num, sizeof(struct measurement));
     //Create a settings file if one doesn't exist.

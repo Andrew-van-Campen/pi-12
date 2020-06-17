@@ -26,8 +26,9 @@ void createFile()
     if (data_file == NULL)
     {
         data_file = fopen(filename, "w");
-        //Create a column in the data file for each measurement.
-        fprintf(data_file, "Date,Time,");
+        //Create a column for date & time.
+        fprintf(data_file, "Date & Time,");
+        //Create a column for each measurement.
         for (int i = 0; i <= num - 1; i++)
         {
             if ((MEAS + i)->ENABLED)
@@ -55,7 +56,7 @@ void writeToFile()
     {
         fprintf(data_file, "0");
     }
-    fprintf(data_file, "%d,", info->tm_mday);
+    fprintf(data_file, "%d ", info->tm_mday);
     if (info->tm_hour < 10)
     {
         fprintf(data_file, "0");

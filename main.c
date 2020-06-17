@@ -4,7 +4,7 @@
 
 #include "command.h"
 #include "settings.h"
-#include "sdi12.h"
+#include "serial.h"
 #include "data.h"
 
 //Main program.
@@ -37,8 +37,13 @@ void run()
             if ((MEAS + i)->ENABLED &&
                     (current - (MEAS + i)->start) % (MEAS + i)->interval == 0)
             {
-                //Send an SDI-12 command.
-                //Parse measurements.
+                //TODO:
+                //Send measurement command.
+                //Wait number of milliseconds.
+                //Send aD0! command.
+                //If too few measurements, send aD1!, etc.
+                //Parse measurement.
+                (MEAS + i)->value = "78.826";
                 //Save measurements to data file.
                 writeToFile();
             }
