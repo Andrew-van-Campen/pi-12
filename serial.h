@@ -4,3 +4,4 @@
 #include <unistd.h>
 
 void test();
+void sendCommand(char *command);

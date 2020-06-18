@@ -15,6 +15,10 @@ void test()
 //Open and set up serial port.
 void openPort()
 {
+    //Get serial port settings.
+    char data_bits = *serial_format;
+    char parity = *(serial_format + 1);
+    char stop_bits = *(serial_format + 2);
     //Open serial port.
     port = open(port_name, O_RDWR);
     //Handle errors.
@@ -81,4 +85,10 @@ char *receive(int bytes)
 void closePort()
 {
     close(port);
+}
+
+//Send an SDI-12 command and print the response.
+void sendCommand(char *command)
+{
+    printf("Test.\n");
 }

@@ -20,6 +20,7 @@ void settingError()
   7 - setPort()
   8 - setBaud()
   9 - setFormat()
+  10 - sendCommand()
   */
 int command(int number, char **args)
 {
@@ -317,6 +318,20 @@ int command(int number, char **args)
         {
             settingError();
             return 0;
+        }
+    }
+    //'send' entered; return 10;
+    else if (strcmp(*(args + 1), "send") == 0)
+    {
+        //If no SDI-12 command was entered, return 0; otherwise return 10.
+        if (number < 3)
+        {
+            printf("ERROR: No SDI-12 command entered.\n");
+            return 0;
+        }
+        else
+        {
+            return 10;
         }
     }
     //None of the above commands entered; not a recognized command; return 0.

@@ -100,6 +100,9 @@ int main(int argc, char **argv)
         case 9:
             setFormat(*(argv + 3));
             break;
+        case 10:
+            sendCommand(*(argv + 2));
+            break;
     }
     //Return.
     return 0;
