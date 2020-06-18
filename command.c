@@ -23,7 +23,7 @@ int command(int number, char **args)
     //No commands entered; return 0.
     if (number == 1)
     {
-        printf("No commands entered. Type ./datalogger followed by a command.\n");
+        printf("No commands entered. Type ./pi-12 followed by a command.\n");
         return 0;
     }
     //'run' entered; return 1.

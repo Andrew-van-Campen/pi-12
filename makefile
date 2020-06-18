@@ -1,5 +1,5 @@
-datalogger: main.o command.o settings.o serial.o data.o
-	gcc -o datalogger main.o command.o settings.o serial.o data.o
+pi-12: main.o command.o settings.o serial.o data.o
+	gcc -o pi-12 main.o command.o settings.o serial.o data.o
 main.o: main.c global.h command.h settings.h serial.h data.h
 	gcc -c main.c
 command.o: command.c global.h command.h
