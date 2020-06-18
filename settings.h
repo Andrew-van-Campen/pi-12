@@ -2,9 +2,16 @@
 
 FILE *settings_file;
 
+//General commands
 void reset();
 void load();
 void view();
+//Measurement settings
 void setMeas(char *label, char *setting, char *value);
-void setData(char *string);
+//Data settings
+void setSite(char *string);
+void setPath(char *string);
+//Serial port settings
 void setPort(char *string);
+void setBaud(char *string);
+void setFormat(char *string);

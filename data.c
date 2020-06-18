@@ -8,14 +8,14 @@ int createFile()
 {
     //Assign file name based on current month.
     free(filepath);
-    filepath = (char *) calloc(60, sizeof(char));
+    filepath = (char *) calloc(70, sizeof(char));
     if (info->tm_mon < 9)
     {
-        sprintf(filepath, "%s/%d-0%d.csv", data_path, info->tm_year + 1900, info->tm_mon + 1);
+        sprintf(filepath, "%s/%s-%d-0%d.csv", data_path, site_name, info->tm_year + 1900, info->tm_mon + 1);
     }
     else
     {
-        sprintf(filepath, "%s/%d-%d.csv", data_path, info->tm_year + 1900, info->tm_mon + 1);
+        sprintf(filepath, "%s/%s-%d-%d.csv", data_path, site_name, info->tm_year + 1900, info->tm_mon + 1);
     }
     //Attempt to open a file with that name.
     data_file = fopen(filepath, "r");

@@ -15,8 +15,11 @@ void settingError()
   2 - view()
   3 - reset()
   4 - setMeas()
-  5 - setData()
-  6 - setPort()
+  5 - setSite()
+  6 - setPath()
+  7 - setPort()
+  8 - setBaud()
+  9 - setFormat()
   */
 int command(int number, char **args)
 {
@@ -208,25 +211,32 @@ int command(int number, char **args)
                 return 0;
             }
         }
-        //'set DATA' entered.
-        else if (strcmp(*(args + 2), "DATA") == 0)
+        //'set SITE' entered.
+        else if (strcmp(*(args + 2), "SITE") == 0)
         {
-            //If path name is not too long, return 5; otherwise return 0.
-            if (strlen(*(args + 3)) <= 50)
-            {
-                return 5;
-            }
-            else
+            //Check that the name is not too long.
+            if (strlen(*(args + 3)) > 20)
             {
                 settingError();
                 return 0;
             }
+            //Check that the name contains no spaces.
+            for (int i = 0; i <= strlen(*(args + 3)) - 1; i++)
+            {
+                if (*(*(args + 3) + i) == ' ')
+                {
+                    settingError();
+                    return 0;
+                }
+            }
+            //If the above checks are passed, return 5.
+            return 5;
         }
-        //'set PORT' entered.
-        else if (strcmp(*(args + 2), "DATA") == 0)
+        //'set PATH' entered.
+        else if (strcmp(*(args + 2), "PATH") == 0)
         {
-            //If port name is not too long, return 6; otherwise return 0.
-            if (strlen(*(args + 3)) <= 12)
+            //If path name is not too long, return 6; otherwise return 0.
+            if (strlen(*(args + 3)) <= 30)
             {
                 return 6;
             }
@@ -235,6 +245,72 @@ int command(int number, char **args)
                 settingError();
                 return 0;
             }
+        }
+        //'set PORT' entered.
+        else if (strcmp(*(args + 2), "PORT") == 0)
+        {
+            //If port name is not too long, return 7; otherwise return 0.
+            if (strlen(*(args + 3)) <= 12)
+            {
+                return 7;
+            }
+            else
+            {
+                settingError();
+                return 0;
+            }
+        }
+        //'set BAUD' entered.
+        else if (strcmp(*(args + 2), "BAUD") == 0)
+        {
+            //Check that the string doesn't have too many characters.
+            if (strlen(*(args + 3)) > 6)
+            {
+                settingError();
+                return 0;
+            }
+            //Check that every character is a digit.
+            for (int i = 0; i <= strlen(*(args + 3)) - 1; i++)
+            {
+                if (*(*(args + 3) + i) - 48 < 0 || *(*(args + 3) + i) - 48 > 9)
+                {
+                    settingError();
+                    return 0;
+                }
+            }
+            //If the above checks are passed, return 8.
+            return 8;
+        }
+        //'set FORMAT' entered.
+        else if (strcmp(*(args + 2), "FORMAT") == 0)
+        {
+            //Check that the string has the right number of characters.
+            if (strlen(*(args + 3)) != 3)
+            {
+                settingError();
+                return 0;
+            }
+            //Check that the string is the correct format:
+            //The first character must be 5-8.
+            if (**(args + 3) - 48 < 5 || **(args + 3) - 48 > 8)
+            {
+                settingError();
+                return 0;
+            }
+            //The second character must be E, O, or N.
+            if (*(*(args + 3) + 1) != 'E' && *(*(args + 3) + 1) != 'O' && *(*(args + 3) + 1) != 'N')
+            {
+                settingError();
+                return 0;
+            }
+            //The last character must be 1 or 2.
+            if (*(*(args + 3) + 2) - 48 != 1 && *(*(args + 3) + 2) - 48 != 2)
+            {
+                settingError();
+                return 0;
+            }
+            //If the above checks are passed, return 9.
+            return 9;
         }
         //None of the above 'set' options entered; invalid setting; return 0.
         else

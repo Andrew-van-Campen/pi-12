@@ -43,7 +43,7 @@ void run()
                 //Send aD0! command.
                 //If too few measurements, send aD1!, etc.
                 //Parse measurement.
-                (MEAS + i)->value = "78.826";
+                (MEAS + i)->value = "12.0512";
                 //Request write to file.
                 write = 1;
             }
@@ -86,10 +86,19 @@ int main(int argc, char **argv)
             setMeas(*(argv + 2), *(argv + 3), *(argv + 4));
             break;
         case 5:
-            setData(*(argv + 3));
+            setSite(*(argv + 3));
             break;
         case 6:
+            setPath(*(argv + 3));
+            break;
+        case 7:
             setPort(*(argv + 3));
+            break;
+        case 8:
+            setBaud(*(argv + 3));
+            break;
+        case 9:
+            setFormat(*(argv + 3));
             break;
     }
     //Return.

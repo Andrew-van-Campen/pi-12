@@ -7,10 +7,11 @@
 void reset()
 {
     settings_file = fopen(".settings", "w");
-    fprintf(settings_file, ".|/dev/ttyACM0\n");
+    fprintf(settings_file, "Test|.\n");
+    fprintf(settings_file, "/dev/ttyACM0|9600|8N1\n");
     for (int i = 0; i <= num - 1; i++)
     {
-        fprintf(settings_file, "0|MEAS%d|0M!|1|01:00:00|00:00:00\n", i);
+        fprintf(settings_file, "0|MEAS%d|0M!|1|00:30:00|00:00:00\n", i);
     }
     fclose(settings_file);
 }
@@ -28,9 +29,21 @@ void load()
     //Read settings from file.
     char c = fgetc(settings_file);
     int pos = 0;
-    //DATA
-    data_path = (char *) calloc(51, sizeof(char));
+    //Data settings:
+    //SITE
+    site_name = (char *) calloc(21, sizeof(char));
     while (c != '|')
+    {
+        *(site_name + pos) = c;
+        pos++;
+        c = fgetc(settings_file);
+    }
+    *(site_name + pos) = '\0';
+    pos = 0;
+    c = fgetc(settings_file);
+    //PATH
+    data_path = (char *) calloc(31, sizeof(char));
+    while (c != '\n')
     {
         *(data_path + pos) = c;
         pos++;
@@ -39,9 +52,10 @@ void load()
     *(data_path + pos) = '\0';
     pos = 0;
     c = fgetc(settings_file);
+    //Serial port settings:
     //PORT
     port_name = (char *) calloc(13, sizeof(char));
-    while (c != '\n')
+    while (c != '|')
     {
         *(port_name + pos) = c;
         pos++;
@@ -50,7 +64,29 @@ void load()
     *(port_name + pos) = '\0';
     pos = 0;
     c = fgetc(settings_file);
-    //Measurement settings
+    //BAUD
+    baud_rate = (char *) calloc(7, sizeof(char));
+    while (c != '|')
+    {
+        *(baud_rate + pos) = c;
+        pos++;
+        c = fgetc(settings_file);
+    }
+    *(baud_rate + pos) = '\0';
+    pos = 0;
+    c = fgetc(settings_file);
+    //FORMAT
+    serial_format = (char *) calloc(4, sizeof(char));
+    while (c != '\n')
+    {
+        *(serial_format + pos) = c;
+        pos++;
+        c = fgetc(settings_file);
+    }
+    *(serial_format + pos) = '\0';
+    pos = 0;
+    c = fgetc(settings_file);
+    //Measurement settings:
     MEAS = (struct measurement *) calloc(num, sizeof(struct measurement));
     for (int i = 0; i <= num - 1; i++)
     {
@@ -128,11 +164,12 @@ void load()
     fclose(settings_file);
 }
 
-//Save settings in file.
+//Save settings to file.
 void save()
 {
     settings_file = fopen(".settings", "w");
-    fprintf(settings_file, "%s|%s\n", data_path, port_name);
+    fprintf(settings_file, "%s|%s\n", site_name, data_path);
+    fprintf(settings_file, "%s|%s|%s\n", port_name, baud_rate, serial_format);
     for (int i = 0; i <= num - 1; i++)
     {
         fprintf(settings_file, "%d|%s|%s|%d|%s|%s\n",
@@ -144,102 +181,6 @@ void save()
                 (MEAS + i)->START);
     }
     fclose(settings_file);
-}
-
-//Print settings to the screen.
-void view()
-{
-    printf("---------------");
-    for (int i = 0; i <= num - 1; i++)
-    {
-        printf("--------");
-        if (i < num - 1)
-        {
-            printf("----");
-        }
-    }
-    printf("\n");
-    //Data save path
-    printf("DATA           %s\n", data_path);
-    //Port name
-    printf("PORT           %s\n", port_name);
-    printf("---------------");
-    for (int i = 0; i <= num - 1; i++)
-    {
-        printf("--------");
-        if (i < num - 1)
-        {
-            printf("----");
-        }
-    }
-    printf("\n");
-    //Measurement labels
-    printf("               ");
-    for (int i = 0; i <= num - 1; i++)
-    {
-        printf("MEAS%d       ", i);
-    }
-    printf("\n");
-    //ENABLED
-    printf("ENABLED        ");
-    for (int i = 0; i <= num - 1; i++)
-    {
-        printf("%d           ", (MEAS + i)->ENABLED);
-    }
-    printf("\n");
-    //NAME
-    printf("NAME           ");
-    for (int i = 0; i <= num - 1; i++)
-    {
-        printf("%s    ", (MEAS + i)->NAME);
-        for (int j = 1; j <= 8 - strlen((MEAS + i)->NAME); j++)
-        {
-            printf(" ");
-        }
-    }
-    printf("\n");
-    //COMMAND
-    printf("COMMAND        ");
-    for (int i = 0; i <= num - 1; i++)
-    {
-        printf("%s    ", (MEAS + i)->COMMAND);
-        for (int j = 1; j <= 8 - strlen((MEAS + i)->COMMAND); j++)
-        {
-            printf(" ");
-        }
-    }
-    printf("\n");
-    //MEASUREMENT
-    printf("MEASUREMENT    ");
-    for (int i = 0; i <= num - 1; i++)
-    {
-        printf("%d           ", (MEAS + i)->MEASUREMENT);
-    }
-    printf("\n");
-    //INTERVAL
-    printf("INTERVAL       ");
-    for (int i = 0; i <= num - 1; i++)
-    {
-        printf("%s    ", (MEAS + i)->INTERVAL);
-    }
-    printf("\n");
-    //START
-    printf("START          ");
-    for (int i = 0; i <= num - 1; i++)
-    {
-        printf("%s    ", (MEAS + i)->START);
-    }
-    printf("\n");
-    printf("---------------");
-    for (int i = 0; i <= num - 1; i++)
-    {
-        printf("--------");
-        if (i < num - 1)
-        {
-            printf("----");
-        }
-    }
-    printf("\n");
 }
 
 //Change a measurement setting.
@@ -273,8 +214,15 @@ void setMeas(char *label, char *setting, char *value)
     save();
 }
 
+//Set site name.
+void setSite(char *string)
+{
+    site_name = string;
+    save();
+}
+
 //Set data path.
-void setData(char *string)
+void setPath(char *string)
 {
     data_path = string;
     save();
@@ -285,4 +233,106 @@ void setPort(char *string)
 {
     port_name = string;
     save();
+}
+
+//Set baud rate
+void setBaud(char *string)
+{
+    baud_rate = string;
+    save();
+}
+
+//Set serial format.
+void setFormat(char *string)
+{
+    serial_format = string;
+    save();
+}
+
+//Helper function for view()
+void printLine()
+{
+    printf("---------------");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("--------");
+        if (i < num - 1)
+        {
+            printf("----");
+        }
+    }
+    printf("\n");
+}
+
+//Print settings to the screen.
+void view()
+{
+    printLine();
+    //Data settings
+    printf("Data Settings:\n");
+    printf("\n");
+    printf("SITE           %s\n", site_name);
+    printf("PATH           %s\n", data_path);
+    printLine();
+    //Serial port settings
+    printf("Serial Port Settings:\n");
+    printf("\n");
+    printf("PORT           %s\n", port_name);
+    printf("BAUD           %s\n", baud_rate);
+    printf("FORMAT         %s\n", serial_format);
+    printLine();
+    //Measurement settings
+    printf("Measurement Settings:\n");
+    printf("\n");
+    printf("               ");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("MEAS%d       ", i);
+    }
+    printf("\n");
+    printf("ENABLED        ");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("%d           ", (MEAS + i)->ENABLED);
+    }
+    printf("\n");
+    printf("NAME           ");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("%s    ", (MEAS + i)->NAME);
+        for (int j = 1; j <= 8 - strlen((MEAS + i)->NAME); j++)
+        {
+            printf(" ");
+        }
+    }
+    printf("\n");
+    printf("COMMAND        ");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("%s    ", (MEAS + i)->COMMAND);
+        for (int j = 1; j <= 8 - strlen((MEAS + i)->COMMAND); j++)
+        {
+            printf(" ");
+        }
+    }
+    printf("\n");
+    printf("MEASUREMENT    ");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("%d           ", (MEAS + i)->MEASUREMENT);
+    }
+    printf("\n");
+    printf("INTERVAL       ");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("%s    ", (MEAS + i)->INTERVAL);
+    }
+    printf("\n");
+    printf("START          ");
+    for (int i = 0; i <= num - 1; i++)
+    {
+        printf("%s    ", (MEAS + i)->START);
+    }
+    printf("\n");
+    printLine();
 }

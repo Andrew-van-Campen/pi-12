@@ -18,15 +18,19 @@ struct measurement
     time_t interval; //Same as above, but in seconds
     char *START;     //Start time which interval is measured from
     time_t start;    //Same as above, but in seconds
-    char *value;    //Most recent measured value
+    char *value;     //Most recent measured value
 };
 
-//Array to store measurement settings.
+//Array to store measurement settings
 struct measurement *MEAS;
-//Path to save data files to.
-char *data_path;
-//Name of serial port.
-char *port_name;
-//Variables to store current time.
+//Data settings
+char *site_name;     //20 characters
+char *data_path;     //30 characters
+//Serial port settings
+char *port_name;     //12 characters
+char *baud_rate;     //6 characters
+char *serial_format; //3 characters
+
+//Variables to store current time
 time_t current;
 struct tm *info;
