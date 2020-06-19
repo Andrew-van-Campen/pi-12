@@ -7,9 +7,91 @@
 #include "serial.h"
 #include "data.h"
 
+//Return the process ID saved in file.
+int getProcess()
+{
+    FILE *process = fopen(".process", "r");
+    //Create file if it doesn't exist.
+    if (process == NULL)
+    {
+        process = fopen(".process", "w");
+        fprintf(process, "0");
+        fclose(process);
+        //Re-open for reading.
+        process = fopen(".process", "r");
+    }
+    //Read process ID from file.
+    char *s = (char *) calloc(7, sizeof(char));
+    char c = fgetc(process);
+    int pos = 0;
+    while (c != EOF)
+    {
+        *(s + pos) = c;
+        pos++;
+        c = fgetc(process);
+    }
+    *(s + pos) = '\0';
+    fclose(process);
+    //Convert to integer and return.
+    int pid = atoi(s);
+    free(s);
+    return pid;
+}
+
+//Save the current process ID in file.
+void saveProcess()
+{
+    FILE *process = fopen(".process", "w");
+    fprintf(process, "%d", getpid());
+    fclose(process);
+}
+
+//Stop program running in the background.
+void stop()
+{
+    //Kill background process if currently running.
+    int pid = getProcess();
+    if (pid == 0)
+    {
+        printf("ERROR: Program is not currently running.\n");
+    }
+    else
+    {
+        char *command = (char *) calloc(12, sizeof(char));
+        sprintf(command, "kill %d", pid);
+        system(command);
+        printf("Program stopped.\n");
+    }
+    //Clear process ID in file.
+    FILE *process = fopen(".process", "w");
+    fprintf(process, "0");
+    fclose(process);
+}
+
+//Print program status.
+void status()
+{
+    if(getProcess() == 0)
+    {
+        printf("STOPPED\n");
+    }
+    else
+    {
+        printf("RUNNING\n");
+    }
+}
+
 //Main program; call in background.
 void runNew()
 {
+    //Check if program is already running.
+    if (getProcess() != 0)
+    {
+        printf("ERROR: Program is already running.\n");
+        return;
+    }
+    //Save process ID in file.
+    saveProcess();
     //Get current time.
     time(&current);
     info = localtime(&current);
@@ -70,8 +152,8 @@ void runNew()
 //Clone current process and call main program from there.
 void run()
 {
-    int pid = fork();
-    if (pid == 0)
+    int p = fork();
+    if (p == 0)
     {
         runNew();
     }
@@ -117,6 +199,12 @@ int main(int argc, char **argv)
             break;
         case 10:
             sendCommand(*(argv + 2));
+            break;
+        case 11:
+            stop();
+            break;
+        case 12:
+            status();
             break;
     }
     //Return.

@@ -6,7 +6,7 @@
 //Print invalid setting message.
 void settingError()
 {
-    printf("Invalid setting.\n");
+    printf("ERROR: Invalid setting.\n");
 }
 
 /*Take input from user; return an integer to main() function, indicating which function to run
@@ -21,6 +21,8 @@ void settingError()
   8 - setBaud()
   9 - setFormat()
   10 - sendCommand()
+  11 - stop()
+  12 - status()
   */
 int command(int number, char **args)
 {
@@ -333,7 +335,7 @@ int command(int number, char **args)
             return 0;
         }
     }
-    //'send' entered; return 10;
+    //'send' entered.
     else if (strcmp(*(args + 1), "send") == 0)
     {
         //If no SDI-12 command was entered, return 0; otherwise return 10.
@@ -347,10 +349,20 @@ int command(int number, char **args)
             return 10;
         }
     }
+    //'stop' entered; return 11.
+    else if (strcmp(*(args + 1), "stop") == 0)
+    {
+        return 11;
+    }
+    //'status' entered; return 12.
+    else if (strcmp(*(args + 1), "status") == 0)
+    {
+        return 12;
+    }
     //None of the above commands entered; not a recognized command; return 0.
     else
     {
-        printf("Not a recognized command.\n");
+        printf("ERROR: Not a recognized command.\n");
         return 0;
     }
     //Return 0 here as a fail-safe.
