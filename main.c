@@ -7,13 +7,13 @@
 #include "serial.h"
 #include "data.h"
 
-//Main program.
-void run()
+//Main program; call in background.
+void runNew()
 {
     //Get current time.
     time(&current);
     info = localtime(&current);
-    //Create data file if it doesn't already exist.
+    //Create data file if it doesn't already exist, and handle errors.
     if (createFile() == -1)
     {
         return;
@@ -31,7 +31,7 @@ void run()
             time(&current);
         }
         info = localtime(&current);
-        //Create data file if it doesn't already exist.
+        //Create data file if it doesn't already exist, and handle errors.
         if (createFile() == -1)
         {
             return;
@@ -64,6 +64,16 @@ void run()
                 (MEAS + i)->value = "";
             }
         }
+    }
+}
+
+//Clone current process and call main program from there.
+void run()
+{
+    int pid = fork();
+    if (pid == 0)
+    {
+        runNew();
     }
 }
 
