@@ -9,7 +9,6 @@ struct termios tty;
 
 void test()
 {
-
 }
 
 //Open and set up serial port.
@@ -90,5 +89,5 @@ void closePort()
 //Send an SDI-12 command and print the response.
 void sendCommand(char *command)
 {
-    printf("Test.\n");
+    printf("Test\n");
 }

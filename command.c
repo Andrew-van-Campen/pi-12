@@ -6,7 +6,7 @@
 //Print invalid setting message.
 void settingError()
 {
-    printf("ERROR: Invalid setting.\n");
+    printf("Invalid setting.\n");
 }
 
 /*Take input from user; return an integer to main() function, indicating which function to run
@@ -43,7 +43,7 @@ int command(int number, char **args)
     //'reset' entered; double check with user.
     else if (strcmp(*(args + 1), "reset") == 0)
     {
-        printf("Restore all settings to default values? [y/n]: ");
+        printf("Restore all settings to default values? [y/n] ");
         char c = getc(stdin);
         //If user confirms reset, return 3; if not, return 0.
         if (c == 'y' || c == 'Y')
@@ -279,8 +279,21 @@ int command(int number, char **args)
                     return 0;
                 }
             }
-            //If the above checks are passed, return 8.
-            return 8;
+            //If the number is a valid baud rate, return 8; otherwise return 0.
+            int b = atoi(*(args + 3));
+            if (b == 0 || b == 50 || b == 75 ||
+                    b == 110 || b == 134 || b == 150 || b == 200 || b == 300 || b == 600 ||
+                    b == 1200 || b == 1800 || b == 2400 || b == 4800 || b == 9600 ||
+                    b == 19200 || b == 38400 || b == 57600 || b == 76800 ||
+                    b == 115200)
+            {
+                return 8;
+            }
+            else
+            {
+                settingError();
+                return 0;
+            }
         }
         //'set FORMAT' entered.
         else if (strcmp(*(args + 2), "FORMAT") == 0)
@@ -337,7 +350,7 @@ int command(int number, char **args)
     //None of the above commands entered; not a recognized command; return 0.
     else
     {
-        printf("ERROR: Not a recognized command.\n");
+        printf("Not a recognized command.\n");
         return 0;
     }
     //Return 0 here as a fail-safe.

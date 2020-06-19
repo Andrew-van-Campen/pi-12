@@ -13,6 +13,11 @@ void run()
     //Get current time.
     time(&current);
     info = localtime(&current);
+    //Create data file if it doesn't already exist.
+    if (createFile() == -1)
+    {
+        return;
+    }
     //Execute loop endlessly.
     time_t previous;
     int write;
