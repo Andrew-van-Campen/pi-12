@@ -6,8 +6,8 @@
 //Create a new settings settings_file with default settings.
 void reset()
 {
-    settings_file = fopen(".settings", "w");
-    fprintf(settings_file, "Test|.\n");
+    settings_file = fopen(settings_filepath, "w");
+    fprintf(settings_file, "Test|%s\n", getenv("HOME"));
     fprintf(settings_file, "/dev/ttyACM0|9600|8N1\n");
     for (int i = 0; i <= num - 1; i++)
     {
@@ -19,12 +19,18 @@ void reset()
 //Load settings from file.
 void load()
 {
+    //Set program file paths.
+    char *home = getenv("HOME");
+    settings_filepath = (char *) calloc(30, sizeof(char));
+    sprintf(settings_filepath, "%s/.settings", home);
+    process_filepath = (char *) calloc(30, sizeof(char));
+    sprintf(process_filepath, "%s/.process", home);
     //Create a settings file if one doesn't exist.
-    settings_file = fopen(".settings", "r");
+    settings_file = fopen(settings_filepath, "r");
     if (settings_file == NULL)
     {
         reset();
-        settings_file = fopen(".settings", "r");
+        settings_file = fopen(settings_filepath, "r");
     }
     //Read settings from file.
     char c = fgetc(settings_file);
@@ -167,7 +173,7 @@ void load()
 //Save settings to file.
 void save()
 {
-    settings_file = fopen(".settings", "w");
+    settings_file = fopen(settings_filepath, "w");
     fprintf(settings_file, "%s|%s\n", site_name, data_path);
     fprintf(settings_file, "%s|%s|%s\n", port_name, baud_rate, serial_format);
     for (int i = 0; i <= num - 1; i++)

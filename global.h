@@ -34,3 +34,7 @@ char *serial_format; //3 characters
 //Variables to store current time
 time_t current;
 struct tm *info;
+
+//Paths to store program files.
+char *settings_filepath;
+char *process_filepath;

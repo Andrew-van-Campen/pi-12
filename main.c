@@ -10,15 +10,15 @@
 //Return the process ID saved in file.
 int getProcess()
 {
-    FILE *process = fopen(".process", "r");
+    FILE *process = fopen(process_filepath, "r");
     //Create file if it doesn't exist.
     if (process == NULL)
     {
-        process = fopen(".process", "w");
+        process = fopen(process_filepath, "w");
         fprintf(process, "0");
         fclose(process);
         //Re-open for reading.
-        process = fopen(".process", "r");
+        process = fopen(process_filepath, "r");
     }
     //Read process ID from file.
     char *s = (char *) calloc(7, sizeof(char));
@@ -41,7 +41,7 @@ int getProcess()
 //Save the current process ID in file.
 void saveProcess()
 {
-    FILE *process = fopen(".process", "w");
+    FILE *process = fopen(process_filepath, "w");
     fprintf(process, "%d", getpid());
     fclose(process);
 }
@@ -57,21 +57,21 @@ void stop()
     }
     else
     {
-        char *command = (char *) calloc(12, sizeof(char));
+        char *command = (char *) calloc(20, sizeof(char));
         sprintf(command, "kill %d", pid);
         system(command);
-        printf("Program stopped.\n");
+        free(command);
     }
     //Clear process ID in file.
-    FILE *process = fopen(".process", "w");
+    FILE *process = fopen(process_filepath, "w");
     fprintf(process, "0");
     fclose(process);
 }
 
-//Print program status.
+//Display program status.
 void status()
 {
-    if(getProcess() == 0)
+    if (getProcess() == 0)
     {
         printf("STOPPED\n");
     }
