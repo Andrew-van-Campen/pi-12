@@ -7,7 +7,7 @@
 void reset()
 {
     settings_file = fopen(settings_filepath, "w");
-    fprintf(settings_file, "Test|%s/data\n", getenv("HOME"));
+    fprintf(settings_file, "Test|%s\n", getenv("HOME"));
     fprintf(settings_file, "/dev/ttyACM0|9600|8N1\n");
     for (int i = 0; i <= num - 1; i++)
     {
