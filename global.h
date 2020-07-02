@@ -38,4 +38,3 @@ struct tm *info;
 
 //Paths to store program files.
 char *settings_filepath;
-char *process_filepath;

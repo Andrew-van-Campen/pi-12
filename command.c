@@ -11,7 +11,7 @@ void settingError()
 
 /*Take input from user; return an integer to main() function, indicating which function to run
   0 - do nothing (ERROR or invalid input)
-  1 - runBackround()
+  1 - run()
   2 - view()
   3 - reset()
   4 - setMeas()
@@ -21,9 +21,6 @@ void settingError()
   8 - setBaud()
   9 - setFormat()
   10 - sendCommand()
-  11 - stop()
-  12 - status()
-  13 - runDebug()
   */
 int command(int argc, char **argv)
 {
@@ -33,16 +30,9 @@ int command(int argc, char **argv)
         printf("No commands entered. Type ./pi-12 followed by a command.\n");
         return 0;
     }
-    //'run' entered.
+    //'run' entered; return 1.
     if (strcmp(*(argv + 1), "run") == 0)
     {
-        if (argc >= 3)
-        {
-            if (strcmp(*(argv + 2), "debug") == 0)
-            {
-                return 13;
-            }
-        }
         return 1;
     }
     //'view' entered; return 2.
@@ -412,16 +402,6 @@ int command(int argc, char **argv)
         {
             return 10;
         }
-    }
-    //'stop' entered; return 11.
-    else if (strcmp(*(argv + 1), "stop") == 0)
-    {
-        return 11;
-    }
-    //'status' entered; return 12.
-    else if (strcmp(*(argv + 1), "status") == 0)
-    {
-        return 12;
     }
     //None of the above commands entered; not a recognized command; return 0.
     else

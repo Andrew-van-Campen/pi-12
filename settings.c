@@ -23,8 +23,6 @@ void load()
     char *home = getenv("HOME");
     settings_filepath = (char *) calloc(30, sizeof(char));
     sprintf(settings_filepath, "%s/.pi-12_settings", home);
-    process_filepath = (char *) calloc(30, sizeof(char));
-    sprintf(process_filepath, "%s/.pi-12_process", home);
     //Create a settings file if one doesn't exist.
     settings_file = fopen(settings_filepath, "r");
     if (settings_file == NULL)

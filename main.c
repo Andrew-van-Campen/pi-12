@@ -6,7 +6,6 @@
 #include "settings.h"
 #include "serial.h"
 #include "data.h"
-#include "process.h"
 
 //Main program.
 void run()
@@ -68,30 +67,6 @@ void run()
     }
 }
 
-//Run main program in debug mode.
-void runDebug()
-{
-    run();
-}
-
-//Clone current process and call main program from there.
-void runBackground()
-{
-    int pid = fork();
-    if (pid == 0)
-    {
-        //Check if program is already running.
-        if (getProcess() != 0)
-        {
-            printf("ERROR: Program is already running.\n");
-            return;
-        }
-        //Save process ID in file.
-        saveProcess();
-        run();
-    }
-}
-
 int main(int argc, char **argv)
 {
     //Load settings.
@@ -104,7 +79,7 @@ int main(int argc, char **argv)
         case 0:
             break;
         case 1:
-            runBackground();
+            run();
             break;
         case 2:
             view();
@@ -132,15 +107,6 @@ int main(int argc, char **argv)
             break;
         case 10:
             sendCommand(*(argv + 2));
-            break;
-        case 11:
-            stop();
-            break;
-        case 12:
-            status();
-            break;
-        case 13:
-            runDebug();
             break;
     }
     //Return.
