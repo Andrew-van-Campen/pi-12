@@ -11,3 +11,4 @@ serial.o: serial.c global.h serial.h
 data.o: data.c global.h data.h
 	gcc -c data.c
 process.o: process.c global.h process.h
+	gcc -c process.c
