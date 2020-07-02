@@ -11,7 +11,7 @@ void settingError()
 
 /*Take input from user; return an integer to main() function, indicating which function to run
   0 - do nothing (ERROR or invalid input)
-  1 - run()
+  1 - runBackround()
   2 - view()
   3 - reset()
   4 - setMeas()
@@ -23,27 +23,35 @@ void settingError()
   10 - sendCommand()
   11 - stop()
   12 - status()
+  13 - runDebug()
   */
-int command(int number, char **args)
+int command(int argc, char **argv)
 {
     //No commands entered; return 0.
-    if (number == 1)
+    if (argc == 1)
     {
         printf("No commands entered. Type ./pi-12 followed by a command.\n");
         return 0;
     }
-    //'run' entered; return 1.
-    if (strcmp(*(args + 1), "run") == 0)
+    //'run' entered.
+    if (strcmp(*(argv + 1), "run") == 0)
     {
+        if (argc >= 3)
+        {
+            if (strcmp(*(argv + 2), "debug") == 0)
+            {
+                return 13;
+            }
+        }
         return 1;
     }
     //'view' entered; return 2.
-    else if (strcmp(*(args + 1), "view") == 0)
+    else if (strcmp(*(argv + 1), "view") == 0)
     {
         return 2;
     }
     //'reset' entered; double check with user.
-    else if (strcmp(*(args + 1), "reset") == 0)
+    else if (strcmp(*(argv + 1), "reset") == 0)
     {
         printf("Restore all settings to default values? [y/n] ");
         char c = getc(stdin);
@@ -58,38 +66,38 @@ int command(int number, char **args)
         }
     }
     //'set' entered; determine whether setting is valid.
-    else if (strcmp(*(args + 1), "set") == 0)
+    else if (strcmp(*(argv + 1), "set") == 0)
     {
         //Not enough arguments for this to be a valid setting; return 0.
-        if (number < 4)
+        if (argc < 4)
         {
             settingError();
             return 0;
         }
         //'set MEAS#' entered.
-        if (*(*(args + 2) + 0) == 'M' &&
-                *(*(args + 2) + 1) == 'E' &&
-                *(*(args + 2) + 2) == 'A' &&
-                *(*(args + 2) + 3) == 'S' &&
-                *(*(args + 2) + 4) - 48 >= 0 && *(*(args + 2) + 4) - 48 <= num - 1)
+        if (*(*(argv + 2) + 0) == 'M' &&
+                *(*(argv + 2) + 1) == 'E' &&
+                *(*(argv + 2) + 2) == 'A' &&
+                *(*(argv + 2) + 3) == 'S' &&
+                *(*(argv + 2) + 4) - 48 >= 0 && *(*(argv + 2) + 4) - 48 <= num - 1)
         {
             //Not enough arguments for this to be a valid setting; return 0.
-            if (number < 5)
+            if (argc < 5)
             {
                 settingError();
                 return 0;
             }
             //'set MEAS# ENABLED' entered.
-            if (strcmp(*(args + 3), "ENABLED") == 0)
+            if (strcmp(*(argv + 3), "ENABLED") == 0)
             {
                 //Should have string length of 1.
-                if (strlen(*(args + 4)) != 1)
+                if (strlen(*(argv + 4)) != 1)
                 {
                     settingError();
                     return 0;
                 }
                 //If the value is 0 or 1, return 4; otherwise return 0.
-                if (**(args + 4) == '0' || **(args + 4) == '1')
+                if (**(argv + 4) == '0' || **(argv + 4) == '1')
                 {
                     return 4;
                 }
@@ -100,10 +108,10 @@ int command(int number, char **args)
                 }
             }
             //'set MEAS# NAME' entered.
-            else if (strcmp(*(args + 3), "NAME") == 0)
+            else if (strcmp(*(argv + 3), "NAME") == 0)
             {
                 //If name is not too long, return 4; otherwise return 0.
-                if (strlen(*(args + 4)) <= 8)
+                if (strlen(*(argv + 4)) <= 8)
                 {
                     return 4;
                 }
@@ -114,22 +122,22 @@ int command(int number, char **args)
                 }
             }
             //'set MEAS# COMMAND' entered.
-            else if (strcmp(*(args + 3), "COMMAND") == 0)
+            else if (strcmp(*(argv + 3), "COMMAND") == 0)
             {
                 //Check that the command is not too long.
-                if (strlen(*(args + 4)) > 8)
+                if (strlen(*(argv + 4)) > 8)
                 {
                     settingError();
                     return 0;
                 }
                 //The first character must be a valid SDI-12 address.
-                if (**(args + 4) - 48 < 0 || **(args + 4) - 48 > 9)
+                if (**(argv + 4) - 48 < 0 || **(argv + 4) - 48 > 9)
                 {
                     settingError();
                     return 0;
                 }
                 //The last character must be '!'.
-                if (*(*(args + 4) + strlen(*(args + 4)) - 1) != '!')
+                if (*(*(argv + 4) + strlen(*(argv + 4)) - 1) != '!')
                 {
                     settingError();
                     return 0;
@@ -138,16 +146,16 @@ int command(int number, char **args)
                 return 4;
             }
             //'set MEAS# MEASUREMENT' entered.
-            else if (strcmp(*(args + 3), "MEASUREMENT") == 0)
+            else if (strcmp(*(argv + 3), "MEASUREMENT") == 0)
             {
                 //Should have string length of 1.
-                if (strlen(*(args + 4)) != 1)
+                if (strlen(*(argv + 4)) != 1)
                 {
                     settingError();
                     return 0;
                 }
                 //If the value is an integer between 1 and 9, return 4; otherwise return 0.
-                if (**(args + 4) - 48 >= 1 && **(args + 4) - 48 <= 9)
+                if (**(argv + 4) - 48 >= 1 && **(argv + 4) - 48 <= 9)
                 {
                     return 4;
                 }
@@ -157,34 +165,34 @@ int command(int number, char **args)
                     return 0;
                 }
             }
-            //'set MEAS# INTERVAL' or 'set MEAS# START' entered.
-            else if (strcmp(*(args + 3), "INTERVAL") == 0 || strcmp(*(args + 3), "START") == 0)
+            //'set MEAS# INTERVAL' entered.
+            else if (strcmp(*(argv + 3), "INTERVAL") == 0)
             {
                 //Should have string length of 8.
-                if (strlen(*(args + 4)) != 8)
+                if (strlen(*(argv + 4)) != 8)
                 {
                     settingError();
                     return 0;
                 }
                 //The string should represent a time:
                 //Check for colons.
-                if (*(*(args + 4) + 2) != ':' || *(*(args + 4) + 5) != ':')
+                if (*(*(argv + 4) + 2) != ':' || *(*(argv + 4) + 5) != ':')
                 {
                     settingError();
                     return 0;
                 }
                 //Check the hour digits.
-                if (**(args + 4) - 48 == 0 || **(args + 4) - 48 == 1)
+                if (**(argv + 4) - 48 == 0 || **(argv + 4) - 48 == 1)
                 {
-                    if (*(*(args + 4) + 1) - 48 < 0 || *(*(args + 4) + 1) - 48 > 9)
+                    if (*(*(argv + 4) + 1) - 48 < 0 || *(*(argv + 4) + 1) - 48 > 9)
                     {
                         settingError();
                         return 0;
                     }
                 }
-                else if (**(args + 4) - 48 == 2)
+                else if (**(argv + 4) - 48 == 2)
                 {
-                    if (*(*(args + 4) + 1) - 48 < 0 || *(*(args + 4) + 1) - 48 > 3)
+                    if (*(*(argv + 4) + 1) - 48 < 0 || *(*(argv + 4) + 1) - 48 > 3)
                     {
                         settingError();
                         return 0;
@@ -196,10 +204,66 @@ int command(int number, char **args)
                     return 0;
                 }
                 //Check the minute and second digits.
-                if (*(*(args + 4) + 3) - 48 < 0 || *(*(args + 4) + 3) - 48 > 5 ||
-                        *(*(args + 4) + 4) - 48 < 0 || *(*(args + 4) + 4) - 48 > 9 ||
-                        *(*(args + 4) + 6) - 48 < 0 || *(*(args + 4) + 6) - 48 > 5 ||
-                        *(*(args + 4) + 7) - 48 < 0 || *(*(args + 4) + 7) - 48 > 9)
+                if (*(*(argv + 4) + 3) - 48 < 0 || *(*(argv + 4) + 3) - 48 > 5 ||
+                        *(*(argv + 4) + 4) - 48 < 0 || *(*(argv + 4) + 4) - 48 > 9 ||
+                        *(*(argv + 4) + 6) - 48 < 0 || *(*(argv + 4) + 6) - 48 > 5 ||
+                        *(*(argv + 4) + 7) - 48 < 1 || *(*(argv + 4) + 7) - 48 > 9)
+                {
+                    settingError();
+                    return 0;
+                }
+                //Can't be 00:00:00.
+                if (*(*(argv + 4) + 6) - 48 == 0 && *(*(argv + 4) + 7) - 48 == 0)
+                {
+                    settingError();
+                    return 0;
+                }
+                //If the above checks are passed, return 4.
+                return 4;
+            }
+            //'set MEAS# START' entered.
+            else if (strcmp(*(argv + 3), "START") == 0)
+            {
+                //Should have string length of 8.
+                if (strlen(*(argv + 4)) != 8)
+                {
+                    settingError();
+                    return 0;
+                }
+                //The string should represent a time:
+                //Check for colons.
+                if (*(*(argv + 4) + 2) != ':' || *(*(argv + 4) + 5) != ':')
+                {
+                    settingError();
+                    return 0;
+                }
+                //Check the hour digits.
+                if (**(argv + 4) - 48 == 0 || **(argv + 4) - 48 == 1)
+                {
+                    if (*(*(argv + 4) + 1) - 48 < 0 || *(*(argv + 4) + 1) - 48 > 9)
+                    {
+                        settingError();
+                        return 0;
+                    }
+                }
+                else if (**(argv + 4) - 48 == 2)
+                {
+                    if (*(*(argv + 4) + 1) - 48 < 0 || *(*(argv + 4) + 1) - 48 > 3)
+                    {
+                        settingError();
+                        return 0;
+                    }
+                }
+                else
+                {
+                    settingError();
+                    return 0;
+                }
+                //Check the minute and second digits.
+                if (*(*(argv + 4) + 3) - 48 < 0 || *(*(argv + 4) + 3) - 48 > 5 ||
+                        *(*(argv + 4) + 4) - 48 < 0 || *(*(argv + 4) + 4) - 48 > 9 ||
+                        *(*(argv + 4) + 6) - 48 < 0 || *(*(argv + 4) + 6) - 48 > 5 ||
+                        *(*(argv + 4) + 7) - 48 < 0 || *(*(argv + 4) + 7) - 48 > 9)
                 {
                     settingError();
                     return 0;
@@ -215,18 +279,18 @@ int command(int number, char **args)
             }
         }
         //'set SITE' entered.
-        else if (strcmp(*(args + 2), "SITE") == 0)
+        else if (strcmp(*(argv + 2), "SITE") == 0)
         {
             //Check that the name is not too long.
-            if (strlen(*(args + 3)) > 20)
+            if (strlen(*(argv + 3)) > 20)
             {
                 settingError();
                 return 0;
             }
             //Check that the name contains no spaces.
-            for (int i = 0; i <= strlen(*(args + 3)) - 1; i++)
+            for (int i = 0; i <= strlen(*(argv + 3)) - 1; i++)
             {
-                if (*(*(args + 3) + i) == ' ')
+                if (*(*(argv + 3) + i) == ' ')
                 {
                     settingError();
                     return 0;
@@ -236,10 +300,10 @@ int command(int number, char **args)
             return 5;
         }
         //'set PATH' entered.
-        else if (strcmp(*(args + 2), "PATH") == 0)
+        else if (strcmp(*(argv + 2), "PATH") == 0)
         {
             //If path name is not too long, return 6; otherwise return 0.
-            if (strlen(*(args + 3)) <= 30)
+            if (strlen(*(argv + 3)) <= 30)
             {
                 return 6;
             }
@@ -250,10 +314,10 @@ int command(int number, char **args)
             }
         }
         //'set PORT' entered.
-        else if (strcmp(*(args + 2), "PORT") == 0)
+        else if (strcmp(*(argv + 2), "PORT") == 0)
         {
             //If port name is not too long, return 7; otherwise return 0.
-            if (strlen(*(args + 3)) <= 12)
+            if (strlen(*(argv + 3)) <= 12)
             {
                 return 7;
             }
@@ -264,25 +328,25 @@ int command(int number, char **args)
             }
         }
         //'set BAUD' entered.
-        else if (strcmp(*(args + 2), "BAUD") == 0)
+        else if (strcmp(*(argv + 2), "BAUD") == 0)
         {
             //Check that the string doesn't have too many characters.
-            if (strlen(*(args + 3)) > 6)
+            if (strlen(*(argv + 3)) > 6)
             {
                 settingError();
                 return 0;
             }
             //Check that every character is a digit.
-            for (int i = 0; i <= strlen(*(args + 3)) - 1; i++)
+            for (int i = 0; i <= strlen(*(argv + 3)) - 1; i++)
             {
-                if (*(*(args + 3) + i) - 48 < 0 || *(*(args + 3) + i) - 48 > 9)
+                if (*(*(argv + 3) + i) - 48 < 0 || *(*(argv + 3) + i) - 48 > 9)
                 {
                     settingError();
                     return 0;
                 }
             }
             //If the number is a valid baud rate, return 8; otherwise return 0.
-            int b = atoi(*(args + 3));
+            int b = atoi(*(argv + 3));
             if (b == 0 || b == 50 || b == 75 ||
                     b == 110 || b == 134 || b == 150 || b == 200 || b == 300 || b == 600 ||
                     b == 1200 || b == 1800 || b == 2400 || b == 4800 || b == 9600 ||
@@ -298,29 +362,29 @@ int command(int number, char **args)
             }
         }
         //'set FORMAT' entered.
-        else if (strcmp(*(args + 2), "FORMAT") == 0)
+        else if (strcmp(*(argv + 2), "FORMAT") == 0)
         {
             //Check that the string has the right number of characters.
-            if (strlen(*(args + 3)) != 3)
+            if (strlen(*(argv + 3)) != 3)
             {
                 settingError();
                 return 0;
             }
             //Check that the string is the correct format:
             //The first character must be 5-8.
-            if (**(args + 3) - 48 < 5 || **(args + 3) - 48 > 8)
+            if (**(argv + 3) - 48 < 5 || **(argv + 3) - 48 > 8)
             {
                 settingError();
                 return 0;
             }
             //The second character must be E, O, or N.
-            if (*(*(args + 3) + 1) != 'E' && *(*(args + 3) + 1) != 'O' && *(*(args + 3) + 1) != 'N')
+            if (*(*(argv + 3) + 1) != 'E' && *(*(argv + 3) + 1) != 'O' && *(*(argv + 3) + 1) != 'N')
             {
                 settingError();
                 return 0;
             }
             //The last character must be 1 or 2.
-            if (*(*(args + 3) + 2) - 48 != 1 && *(*(args + 3) + 2) - 48 != 2)
+            if (*(*(argv + 3) + 2) - 48 != 1 && *(*(argv + 3) + 2) - 48 != 2)
             {
                 settingError();
                 return 0;
@@ -336,10 +400,10 @@ int command(int number, char **args)
         }
     }
     //'send' entered.
-    else if (strcmp(*(args + 1), "send") == 0)
+    else if (strcmp(*(argv + 1), "send") == 0)
     {
         //If no SDI-12 command was entered, return 0; otherwise return 10.
-        if (number < 3)
+        if (argc < 3)
         {
             printf("ERROR: No SDI-12 command entered.\n");
             return 0;
@@ -350,12 +414,12 @@ int command(int number, char **args)
         }
     }
     //'stop' entered; return 11.
-    else if (strcmp(*(args + 1), "stop") == 0)
+    else if (strcmp(*(argv + 1), "stop") == 0)
     {
         return 11;
     }
     //'status' entered; return 12.
-    else if (strcmp(*(args + 1), "status") == 0)
+    else if (strcmp(*(argv + 1), "status") == 0)
     {
         return 12;
     }

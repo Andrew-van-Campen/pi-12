@@ -8,17 +8,9 @@
 #include "data.h"
 #include "process.h"
 
-//Main program; call in background.
-void runNew()
+//Main program.
+void run()
 {
-    //Check if program is already running.
-    if (getProcess() != 0)
-    {
-        printf("ERROR: Program is already running.\n");
-        return;
-    }
-    //Save process ID in file.
-    saveProcess();
     //Get current time.
     time(&current);
     info = localtime(&current);
@@ -76,13 +68,27 @@ void runNew()
     }
 }
 
-//Clone current process and call main program from there.
-void run()
+//Run main program in debug mode.
+void runDebug()
 {
-    int p = fork();
-    if (p == 0)
+    run();
+}
+
+//Clone current process and call main program from there.
+void runBackground()
+{
+    int pid = fork();
+    if (pid == 0)
     {
-        runNew();
+        //Check if program is already running.
+        if (getProcess() != 0)
+        {
+            printf("ERROR: Program is already running.\n");
+            return;
+        }
+        //Save process ID in file.
+        saveProcess();
+        run();
     }
 }
 
@@ -98,7 +104,7 @@ int main(int argc, char **argv)
         case 0:
             break;
         case 1:
-            run();
+            runBackground();
             break;
         case 2:
             view();
@@ -132,6 +138,9 @@ int main(int argc, char **argv)
             break;
         case 12:
             status();
+            break;
+        case 13:
+            runDebug();
             break;
     }
     //Return.
