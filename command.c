@@ -203,7 +203,9 @@ int command(int argc, char **argv)
                     return 0;
                 }
                 //Can't be 00:00:00.
-                if (*(*(argv + 4) + 6) - 48 == 0 && *(*(argv + 4) + 7) - 48 == 0)
+                if (*(*(argv + 4) + 0) - 48 == 0 && *(*(argv + 4) + 1) - 48 == 0 &&
+                        *(*(argv + 4) + 3) - 48 == 0 && *(*(argv + 4) + 4) - 48 == 0 &&
+                        *(*(argv + 4) + 6) - 48 == 0 && *(*(argv + 4) + 7) - 48 == 0)
                 {
                     settingError();
                     return 0;
