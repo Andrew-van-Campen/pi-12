@@ -9,13 +9,13 @@ int createFile()
     //Assign file name based on current month.
     free(filepath);
     filepath = (char *) calloc(70, sizeof(char));
-    if (info->tm_mon < 9)
+    if (time_info->tm_mon < 9)
     {
-        sprintf(filepath, "%s/%s-%d-0%d.csv", data_path, site_name, info->tm_year + 1900, info->tm_mon + 1);
+        sprintf(filepath, "%s/%s-%d-0%d.csv", data_path, site_name, time_info->tm_year + 1900, time_info->tm_mon + 1);
     }
     else
     {
-        sprintf(filepath, "%s/%s-%d-%d.csv", data_path, site_name, info->tm_year + 1900, info->tm_mon + 1);
+        sprintf(filepath, "%s/%s-%d-%d.csv", data_path, site_name, time_info->tm_year + 1900, time_info->tm_mon + 1);
     }
     //Attempt to open a file with that name.
     data_file = fopen(filepath, "r");
@@ -51,32 +51,32 @@ void writeToFile()
     //Open file.
     data_file = fopen(filepath, "a");
     //Write date and time.
-    fprintf(data_file, "%d-", info->tm_year + 1900);
-    if (info->tm_mon < 9)
+    fprintf(data_file, "%d-", time_info->tm_year + 1900);
+    if (time_info->tm_mon < 9)
     {
         fprintf(data_file, "0");
     }
-    fprintf(data_file, "%d-", info->tm_mon + 1);
-    if (info->tm_mday < 10)
+    fprintf(data_file, "%d-", time_info->tm_mon + 1);
+    if (time_info->tm_mday < 10)
     {
         fprintf(data_file, "0");
     }
-    fprintf(data_file, "%d ", info->tm_mday);
-    if (info->tm_hour < 10)
+    fprintf(data_file, "%d ", time_info->tm_mday);
+    if (time_info->tm_hour < 10)
     {
         fprintf(data_file, "0");
     }
-    fprintf(data_file, "%d:", info->tm_hour);
-    if (info->tm_min < 10)
+    fprintf(data_file, "%d:", time_info->tm_hour);
+    if (time_info->tm_min < 10)
     {
         fprintf(data_file, "0");
     }
-    fprintf(data_file, "%d:", info->tm_min);
-    if (info->tm_sec < 10)
+    fprintf(data_file, "%d:", time_info->tm_min);
+    if (time_info->tm_sec < 10)
     {
         fprintf(data_file, "0");
     }
-    fprintf(data_file, "%d,", info->tm_sec);
+    fprintf(data_file, "%d,", time_info->tm_sec);
     //Write measurements.
     for (int i = 0; i <= num - 1; i++)
     {

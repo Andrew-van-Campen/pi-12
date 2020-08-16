@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
 
 //Maximum number of measurements.
 #define num 10
@@ -29,12 +28,10 @@ char *site_name;     //20 characters
 char *data_path;     //30 characters
 //Serial port settings
 char *port_name;     //12 characters
-char *baud_rate;     //6 characters
+int baud_rate;
 char *serial_format; //3 characters
-
 //Variables to store current time
-time_t current;
-struct tm *info;
-
+time_t current_time;
+struct tm *time_info;
 //Paths to store program files.
 char *settings_filepath;

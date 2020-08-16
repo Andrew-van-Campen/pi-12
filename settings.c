@@ -3,12 +3,12 @@
 #include "global.h"
 #include "settings.h"
 
-//Create a new settings settings_file with default settings.
+//Create a new settings file with default settings.
 void reset()
 {
     settings_file = fopen(settings_filepath, "w");
     fprintf(settings_file, "Test|%s\n", getenv("HOME"));
-    fprintf(settings_file, "/dev/ttyACM0|9600|8N1\n");
+    fprintf(settings_file, "/dev/ttyUSB0|9600|8N1\n");
     for (int i = 0; i <= num - 1; i++)
     {
         fprintf(settings_file, "0|MEAS%d|0M!|1|00:30:00|00:00:00\n", i);
@@ -69,14 +69,15 @@ void load()
     pos = 0;
     c = fgetc(settings_file);
     //BAUD
-    baud_rate = (char *) calloc(7, sizeof(char));
+    char *str_baud_rate = (char *) calloc(7, sizeof(char));
     while (c != '|')
     {
-        *(baud_rate + pos) = c;
+        *(str_baud_rate + pos) = c;
         pos++;
         c = fgetc(settings_file);
     }
-    *(baud_rate + pos) = '\0';
+    *(str_baud_rate + pos) = '\0';
+    baud_rate = atoi(str_baud_rate);
     pos = 0;
     c = fgetc(settings_file);
     //FORMAT
@@ -173,7 +174,7 @@ void save()
 {
     settings_file = fopen(settings_filepath, "w");
     fprintf(settings_file, "%s|%s\n", site_name, data_path);
-    fprintf(settings_file, "%s|%s|%s\n", port_name, baud_rate, serial_format);
+    fprintf(settings_file, "%s|%d|%s\n", port_name, baud_rate, serial_format);
     for (int i = 0; i <= num - 1; i++)
     {
         fprintf(settings_file, "%d|%s|%s|%d|%s|%s\n",
@@ -242,7 +243,7 @@ void setPort(char *string)
 //Set baud rate
 void setBaud(char *string)
 {
-    baud_rate = string;
+    baud_rate = atoi(string);
     save();
 }
 
@@ -282,7 +283,7 @@ void view()
     printf("Serial Port Settings:\n");
     printf("\n");
     printf("PORT           %s\n", port_name);
-    printf("BAUD           %s\n", baud_rate);
+    printf("BAUD           %d\n", baud_rate);
     printf("FORMAT         %s\n", serial_format);
     printLine();
     //Measurement settings

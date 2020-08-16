@@ -11,26 +11,26 @@
 void run()
 {
     //Get current time.
-    time(&current);
-    info = localtime(&current);
+    time(&current_time);
+    time_info = localtime(&current_time);
     //Create data file if it doesn't already exist, and handle errors.
     if (createFile() == -1)
     {
         return;
     }
     //Execute loop endlessly.
-    time_t previous;
+    time_t previous_time;
     int write;
     while (1)
     {
-        previous = current;
+        previous_time = current_time;
         write = 0;
         //Wait until time changes.
-        while (current == previous)
+        while (current_time == previous_time)
         {
-            time(&current);
+            time(&current_time);
         }
-        info = localtime(&current);
+        time_info = localtime(&current_time);
         //Create data file if it doesn't already exist, and handle errors.
         if (createFile() == -1)
         {
@@ -40,7 +40,7 @@ void run()
         for (int i = 0; i <= num - 1; i++)
         {
             if ((MEAS + i)->ENABLED &&
-                    (current - (MEAS + i)->start) % (MEAS + i)->interval == 0)
+                    (current_time - (MEAS + i)->start) % (MEAS + i)->interval == 0)
             {
                 //TODO:
                 //Send measurement command.
@@ -71,8 +71,6 @@ int main(int argc, char **argv)
 {
     //Load settings.
     load();
-    //Test serial port.
-    test();
     //Interpret command from user and call the appropriate function.
     switch(command(argc, argv))
     {

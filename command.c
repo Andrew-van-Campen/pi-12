@@ -9,7 +9,7 @@ void settingError()
     printf("ERROR: Invalid setting.\n");
 }
 
-/*Take input from user; return an integer to main() function, indicating which function to run
+/*Take input from user; return an integer to main() function, indicating which function to run:
   0 - do nothing (ERROR or invalid input)
   1 - run()
   2 - view()
@@ -82,11 +82,7 @@ int command(int argc, char **argv)
             {
                 //Should have string length of 1.
                 if (strlen(*(argv + 4)) != 1)
-                {
-                    settingError();
-                    return 0;
-                }
-                //If the value is 0 or 1, return 4; otherwise return 0.
+                { settingError(); return 0; } //If the value is 0 or 1, return 4; otherwise return 0.
                 if (**(argv + 4) == '0' || **(argv + 4) == '1')
                 {
                     return 4;
@@ -342,8 +338,8 @@ int command(int argc, char **argv)
             if (b == 0 || b == 50 || b == 75 ||
                     b == 110 || b == 134 || b == 150 || b == 200 || b == 300 || b == 600 ||
                     b == 1200 || b == 1800 || b == 2400 || b == 4800 || b == 9600 ||
-                    b == 19200 || b == 38400 || b == 57600 || b == 76800 ||
-                    b == 115200)
+                    b == 19200 || b == 38400 || b == 57600 ||
+                    b == 115200 || b == 230400)
             {
                 return 8;
             }
