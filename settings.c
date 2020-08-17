@@ -8,7 +8,7 @@ void reset()
 {
     settings_file = fopen(settings_filepath, "w");
     fprintf(settings_file, "Test|%s\n", getenv("HOME"));
-    fprintf(settings_file, "/dev/ttyUSB0|9600|8N1\n");
+    fprintf(settings_file, "/dev/ttyUSB0|9600|8N1|<None>|<None>|0\n");
     for (int i = 0; i <= num - 1; i++)
     {
         fprintf(settings_file, "0|MEAS%d|0M!|1|00:30:00|00:00:00\n", i);
@@ -82,7 +82,7 @@ void load()
     c = fgetc(settings_file);
     //FORMAT
     serial_format = (char *) calloc(4, sizeof(char));
-    while (c != '\n')
+    while (c != '|')
     {
         *(serial_format + pos) = c;
         pos++;
@@ -90,6 +90,32 @@ void load()
     }
     *(serial_format + pos) = '\0';
     pos = 0;
+    c = fgetc(settings_file);
+    //PREPEND
+    prepend = (char *) calloc(11, sizeof(char));
+    while (c != '|')
+    {
+        *(prepend + pos) = c;
+        pos++;
+        c = fgetc(settings_file);
+    }
+    *(prepend + pos) = '\0';
+    pos = 0;
+    c = fgetc(settings_file);
+    //APPEND
+    append = (char *) calloc(11, sizeof(char));
+    while (c != '|')
+    {
+        *(append + pos) = c;
+        pos++;
+        c = fgetc(settings_file);
+    }
+    *(append + pos) = '\0';
+    pos = 0;
+    c = fgetc(settings_file);
+    //SKIP
+    skip = c - 48;
+    c = fgetc(settings_file);
     c = fgetc(settings_file);
     //Measurement settings:
     MEAS = (struct measurement *) calloc(num, sizeof(struct measurement));
@@ -167,6 +193,14 @@ void load()
         (MEAS + i)->value = "";
     }
     fclose(settings_file);
+    //Set append and prepend strings.
+    prepend = (char *) calloc(3, sizeof(char));
+    *(prepend + 0) = 'T';
+    *(prepend + 1) = ' ';
+    *(prepend + 2) = '\0';
+    append = (char *) calloc(2, sizeof(char));
+    *(append + 0) = 13;
+    *(append + 1) = '\0';
 }
 
 //Save settings to file.
@@ -174,7 +208,7 @@ void save()
 {
     settings_file = fopen(settings_filepath, "w");
     fprintf(settings_file, "%s|%s\n", site_name, data_path);
-    fprintf(settings_file, "%s|%d|%s\n", port_name, baud_rate, serial_format);
+    fprintf(settings_file, "%s|%d|%s|%s|%s|%d\n", port_name, baud_rate, serial_format, prepend, append, skip);
     for (int i = 0; i <= num - 1; i++)
     {
         fprintf(settings_file, "%d|%s|%s|%d|%s|%s\n",
@@ -254,6 +288,29 @@ void setFormat(char *string)
     save();
 }
 
+//TODO: Set string to prepend to output.
+void setPrepend(char *string)
+{
+    //Handle special characters.
+    //Do not allow '|'.
+    save();
+}
+
+//TODO: Set string to append to output.
+void setAppend(char *string)
+{
+    //Handle special characters.
+    //Do not allow '|'.
+    save();
+}
+
+//Set number of input characters to skip.
+void setSkip(char *string)
+{
+    skip = *string - 48;
+    save();
+}
+
 //Helper function for view()
 void printLine()
 {
@@ -285,6 +342,9 @@ void view()
     printf("PORT           %s\n", port_name);
     printf("BAUD           %d\n", baud_rate);
     printf("FORMAT         %s\n", serial_format);
+    printf("PREPEND        %s\n", prepend);
+    printf("APPEND         %s\n", append);
+    printf("SKIP           %d\n", skip);
     printLine();
     //Measurement settings
     printf("Measurement Settings:\n");

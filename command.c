@@ -21,6 +21,9 @@ void settingError()
   8 - setBaud()
   9 - setFormat()
   10 - sendCommand()
+  11 - setPrepend()
+  12 - setAppend()
+  13 - setSkip()
   */
 int command(int argc, char **argv)
 {
@@ -379,6 +382,28 @@ int command(int argc, char **argv)
             }
             //If the above checks are passed, return 9.
             return 9;
+        }
+        //'set PREPEND' entered.
+        else if (strcmp(*(argv + 2), "PREPEND") == 0)
+        {
+            return 0;
+        }
+        //'set APPEND' entered.
+        else if (strcmp(*(argv + 2), "APPEND") == 0)
+        {
+            return 0;
+        }
+        //'set SKIP' entered.
+        else if (strcmp(*(argv + 2), "SKIP") == 0)
+        {
+            //Check the the number of characters to skip makes sense.
+            if (atoi(*(argv + 3)) < 0 || atoi(*(argv + 3)) > 9)
+            {
+                settingError();
+                return 0;
+            }
+            //If the above checks are passed, return 13.
+            return 13;
         }
         //None of the above 'set' options entered; invalid setting; return 0.
         else

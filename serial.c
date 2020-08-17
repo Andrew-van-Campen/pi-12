@@ -160,8 +160,8 @@ int openPort()
     //Set other control modes.
     tty->c_cflag |= (CREAD | CLOCAL);
     //Set special characters:
-    tty->c_cc[VMIN] = 1;   //Minimum number of characters for read().
-    tty->c_cc[VTIME] = 0;  //Turn off timer.
+    tty->c_cc[VMIN] = 0;   //No minimum number of characters to wait for.
+    tty->c_cc[VTIME] = 10;  //1s (10 ds) timer.
     //Save modified settings, and handle any errors.
     if (tcsetattr(port, TCSAFLUSH, tty) == -1)
     {
@@ -181,30 +181,52 @@ void sendCommand(char *command)
     {
         return;
     }
-    //Copy command into a new string.
-    int length = strlen(command);
-    char *string = (char *) calloc(length + 3, sizeof(char));
-    *(string + 0) = 'T';
-    *(string + 1) = ' ';
-    for (int i = 0; i <= length - 1; i++)
+    //Copy command into a new string, with prepended and appended characters.
+    int length = strlen(prepend) + strlen(command) + strlen(append);
+    char *string = (char *) calloc(length + 1, sizeof(char));
+    int pos = 0;
+    for (int i = 0; *(prepend + i) != '\0'; i++)
     {
-        *(string + i + 2) = *(command + i);
+        *(string + pos) = *(prepend + i);
+        pos++;
     }
-    *(string + length) = 13;
+    for (int i = 0; *(command + i) != '\0'; i++)
+    {
+        *(string + pos) = *(command + i);
+        pos++;
+    }
+    for (int i = 0; *(append + i) != '\0'; i++)
+    {
+        *(string + pos) = *(append + i);
+        pos++;
+    }
+    *(string + pos) = '\0';
     //Write command to serial port.
-    for (int i = 0; i <= length; i++)
+    for (int i = 0; *(string + i) != '\0'; i++)
     {
         write(port, (string + i), 1);
     }
-    //Read data.
+    //Skip input characters as set by user.
     char c;
-    read(port, &c, 1);
-    while (c != 13)
+    for (int i = 1; i <= skip; i++)
     {
-        printf("%c", c);
         read(port, &c, 1);
     }
-    printf("\n");
+    //Save response in string, and print it.
+    char *response = (char *) calloc(256, sizeof(char));
+    for (int i = 0; read(port, &c, 1) && c != 13 && i <= 200; i++)
+    {
+        *(response + i) = c;
+    }
+    if (strlen(response) < 1)
+    {
+        printf("No response.\n");
+    }
+    else
+    {
+        printf("%s\n", response);
+    }
+    free(response);
     //Close serial port.
     close(port);
 }

@@ -15,3 +15,6 @@ void setPath(char *string);
 void setPort(char *string);
 void setBaud(char *string);
 void setFormat(char *string);
+void setPrepend(char *string);
+void setAppend(char *string);
+void setSkip(char *string);

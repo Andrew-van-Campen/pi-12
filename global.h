@@ -5,7 +5,7 @@
 #include <string.h>
 #include <time.h>
 
-//Maximum number of measurements.
+//Maximum number of measurements
 #define num 10
 
 struct measurement
@@ -24,12 +24,15 @@ struct measurement
 //Array to store measurement settings
 struct measurement *MEAS;
 //Data settings
-char *site_name;     //20 characters
-char *data_path;     //30 characters
+char *site_name;     //Name of site; 20 characters
+char *data_path;     //Filepath to store data; 30 characters
 //Serial port settings
-char *port_name;     //12 characters
-int baud_rate;
-char *serial_format; //3 characters
+char *port_name;     //Filepath to serial port; 12 characters
+int baud_rate;       //Baud rate
+char *serial_format; //Specifies data bits, parity, and stop bits; 3 characters
+char *prepend;       //String to prepend to output; 10 characters
+char *append;        //String to append to output; 10 characters
+int skip;            //Number of input characters to skip
 //Variables to store current time
 time_t current_time;
 struct tm *time_info;
