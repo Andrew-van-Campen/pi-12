@@ -106,6 +106,12 @@ int main(int argc, char **argv)
         case 10:
             sendCommand(*(argv + 2));
             break;
+        case 11:
+            setPrepend(*(argv + 3));
+            break;
+        case 12:
+            setAppend(*(argv + 3));
+            break;
         case 13:
             setSkip(*(argv + 3));
             break;

@@ -386,12 +386,44 @@ int command(int argc, char **argv)
         //'set PREPEND' entered.
         else if (strcmp(*(argv + 2), "PREPEND") == 0)
         {
-            return 0;
+            //Check that the string isn't too long.
+            if (strlen(*(argv + 3)) > 20)
+            {
+                settingError();
+                return 0;
+            }
+            //Do not allow '|' character.
+            for (int i = 0; *(*(argv + 3) + i) != '\0'; i++)
+            {
+                if (*(*(argv + 3) + i) == '|')
+                {
+                    settingError();
+                    return 0;
+                }
+            }
+            //If the above checks are passed, return 11.
+            return 11;
         }
         //'set APPEND' entered.
         else if (strcmp(*(argv + 2), "APPEND") == 0)
         {
-            return 0;
+            //Check that the string isn't too long.
+            if (strlen(*(argv + 3)) > 20)
+            {
+                settingError();
+                return 0;
+            }
+            //Do not allow '|' character.
+            for (int i = 0; *(*(argv + 3) + i) != '\0'; i++)
+            {
+                if (*(*(argv + 3) + i) == '|')
+                {
+                    settingError();
+                    return 0;
+                }
+            }
+            //If the above checks are passed, return 12.
+            return 12;
         }
         //'set SKIP' entered.
         else if (strcmp(*(argv + 2), "SKIP") == 0)

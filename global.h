@@ -30,8 +30,8 @@ char *data_path;     //Filepath to store data; 30 characters
 char *port_name;     //Filepath to serial port; 12 characters
 int baud_rate;       //Baud rate
 char *serial_format; //Specifies data bits, parity, and stop bits; 3 characters
-char *prepend;       //String to prepend to output; 10 characters
-char *append;        //String to append to output; 10 characters
+char *prepend;       //String to prepend to output; 20 characters
+char *append;        //String to append to output; 20 characters
 int skip;            //Number of input characters to skip
 //Variables to store current time
 time_t current_time;

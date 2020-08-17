@@ -8,7 +8,7 @@ void reset()
 {
     settings_file = fopen(settings_filepath, "w");
     fprintf(settings_file, "Test|%s\n", getenv("HOME"));
-    fprintf(settings_file, "/dev/ttyUSB0|9600|8N1|<None>|<None>|0\n");
+    fprintf(settings_file, "/dev/ttyUSB0|9600|8N1|%c|%c|0\n", '\0', '\0');
     for (int i = 0; i <= num - 1; i++)
     {
         fprintf(settings_file, "0|MEAS%d|0M!|1|00:30:00|00:00:00\n", i);
@@ -193,14 +193,6 @@ void load()
         (MEAS + i)->value = "";
     }
     fclose(settings_file);
-    //Set append and prepend strings.
-    prepend = (char *) calloc(3, sizeof(char));
-    *(prepend + 0) = 'T';
-    *(prepend + 1) = ' ';
-    *(prepend + 2) = '\0';
-    append = (char *) calloc(2, sizeof(char));
-    *(append + 0) = 13;
-    *(append + 1) = '\0';
 }
 
 //Save settings to file.
@@ -288,19 +280,100 @@ void setFormat(char *string)
     save();
 }
 
-//TODO: Set string to prepend to output.
+//Helper method for setPrepend() and setAppend()
+char *convertSpecial(char *string)
+{
+    //Create string to return.
+    char *output = (char *) calloc(21, sizeof(char));
+    //Initialize indices.
+    int pos_str = 0;
+    int pos_out = 0;
+    //Loop through input string.
+    while (*(string + pos_str) != '\0')
+    {
+        //Check for opening character for special sequence.
+        if (*(string + pos_str) == '<')
+        {
+            //Create a string to store special sequence.
+            char *special = (char *) calloc(8, sizeof(char));
+            //Initialize index for special string.
+            int pos_spec = 0;
+            //Continue looping through input string, but store characters in special string.
+            while (pos_spec <= 5 && *(string + pos_str) != '>' && *(string + pos_str) != '\0')
+            {
+                *(special + pos_spec) = *(string + pos_str);
+                pos_str++;
+                pos_spec++;
+            }
+            //Append closing character if present.
+            if (*(string + pos_str) == '>')
+            {
+                *(special + pos_spec) = *(string + pos_str);
+                pos_str++;
+                pos_spec++;
+            }
+            //Append null character.
+            *(special + pos_spec) = '\0';
+            //Compare special string to sequences representing characters.
+            if (strcmp(special, "<None>") == 0)
+            {
+                *(output + pos_out) = '\0';
+                pos_out++;
+            }
+            else if (strcmp(special, "<LF>") == 0)
+            {
+                *(output + pos_out) = 10;
+                pos_out++;
+            }
+            else if (strcmp(special, "<CR>") == 0)
+            {
+                *(output + pos_out) = 13;
+                pos_out++;
+            }
+            else if (strcmp(special, "<Space>") == 0)
+            {
+                *(output + pos_out) = ' ';
+                pos_out++;
+            }
+            else
+            {
+                //If no characters are represented, take the string literally.
+                pos_spec = 0;
+                while (*(special + pos_spec) != '\0')
+                {
+                    *(output + pos_out) = *(special + pos_spec);
+                    pos_spec++;
+                    pos_out++;
+                }
+            }
+            //Finished with special string.
+            free(special);
+        }
+        //Otherwise proceed as normal.
+        else
+        {
+            *(output + pos_out) = *(string + pos_str);
+            pos_str++;
+            pos_out++;
+        }
+    }
+    //Append null character.
+    *(output + pos_out) = '\0';
+    //Return the converted string.
+    return output;
+}
+
+//Set string to prepend to output.
 void setPrepend(char *string)
 {
-    //Handle special characters.
-    //Do not allow '|'.
+    prepend = convertSpecial(string);
     save();
 }
 
-//TODO: Set string to append to output.
+//Set string to append to output.
 void setAppend(char *string)
 {
-    //Handle special characters.
-    //Do not allow '|'.
+    append = convertSpecial(string);
     save();
 }
 
@@ -326,6 +399,32 @@ void printLine()
     printf("\n");
 }
 
+//Another helper function for view()
+void printSpecial(char *string)
+{
+    for (int i = 0; *(string + i) != '\0'; i++)
+    {
+        switch (*(string + i))
+        {
+            case 10:
+                printf("<LF>");
+            case 13:
+                printf("<CR>");
+                break;
+            case ' ':
+                printf("<Space>");
+                break;
+            default:
+                printf("%c", *(string + i));
+        }
+    }
+    if (*string == '\0')
+    {
+        printf("<None>");
+    }
+    printf("\n");
+}
+
 //Print settings to the screen.
 void view()
 {
@@ -342,8 +441,10 @@ void view()
     printf("PORT           %s\n", port_name);
     printf("BAUD           %d\n", baud_rate);
     printf("FORMAT         %s\n", serial_format);
-    printf("PREPEND        %s\n", prepend);
-    printf("APPEND         %s\n", append);
+    printf("PREPEND        ");
+    printSpecial(prepend);
+    printf("APPEND         ");
+    printSpecial(append);
     printf("SKIP           %d\n", skip);
     printLine();
     //Measurement settings
