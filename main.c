@@ -104,7 +104,7 @@ int main(int argc, char **argv)
             setFormat(*(argv + 3));
             break;
         case 10:
-            sendCommand(*(argv + 2));
+            printResponse(*(argv + 2));
             break;
         case 11:
             setPrepend(*(argv + 3));

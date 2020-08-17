@@ -3,4 +3,5 @@
 #include <termios.h>
 #include <unistd.h>
 
-void sendCommand(char *command);
+char *getResponse(char *command);
+void printResponse(char *command);
