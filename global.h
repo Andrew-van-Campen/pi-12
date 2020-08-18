@@ -39,5 +39,5 @@ int skip;            //Number of input characters to skip
 //Variables to store current time
 time_t current_time;
 struct tm *time_info;
-//Paths to store program files.
+//Path to store settings file.
 char *settings_filepath;

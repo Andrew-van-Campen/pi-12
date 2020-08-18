@@ -19,10 +19,11 @@ void reset()
 //Load settings from file.
 void load()
 {
-    //Set program file paths.
+    //Set path to settings file.
     char *home = getenv("HOME");
     settings_filepath = (char *) calloc(30, sizeof(char));
-    sprintf(settings_filepath, "%s/.pi-12_settings", home);
+    sprintf(settings_filepath, "%s/.pi-12-settings", home);
+    free(home);
     //Create a settings file if one doesn't exist.
     settings_file = fopen(settings_filepath, "r");
     if (settings_file == NULL)
