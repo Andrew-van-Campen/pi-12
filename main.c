@@ -18,14 +18,27 @@ void run()
     {
         return;
     }
-    //Execute loop endlessly.
+    //Initialize variables for keeping track of information.
     time_t previous_time;
     int write;
+    char *data_command = (char *) calloc(5, sizeof(char));
+    *(data_command + 1) = 'D';
+    *(data_command + 2) = '0';
+    *(data_command + 3) = '!';
+    *(data_command + 4) = '\0';
+    char *time_delay_str = (char *) calloc(4, sizeof(char));
+    *(time_delay_str + 3) = '\0';
+    int time_delay;
+    int pos_resp;
+    int pos_val;
+    int count;
+    //Execute loop endlessly.
     while (1)
     {
-        previous_time = current_time;
+        //Reset write requests.
         write = 0;
         //Wait until time changes.
+        previous_time = current_time;
         while (current_time == previous_time)
         {
             time(&current_time);
@@ -42,15 +55,83 @@ void run()
             if ((MEAS + i)->ENABLED &&
                     (current_time - (MEAS + i)->start) % (MEAS + i)->interval == 0)
             {
-                //TODO:
+                //Flag for measurement.
+                (MEAS + i)->flag = 1;
+            }
+        }
+        //For each sensor that's flagged, take measurements.
+        for (int i = 0; i <= num - 1; i++)
+        {
+            if ((MEAS + i)->flag)
+            {
                 //Send measurement command.
-                //Wait number of milliseconds.
-                //Send aD0! command.
-                //If too few measurements, send aD1!, etc.
-                //Parse measurement.
-                (MEAS + i)->value = "12.0512";
-                //Request write to file.
-                write = 1;
+                sendCommand((MEAS + i)->COMMAND);
+                //Parse response.
+                for (int j = 0; j <= 2; j++)
+                {
+                    *(time_delay_str + j) = *(response + j + 1);
+                }
+                time_delay = atoi(time_delay_str);
+                //Wait number of seconds.
+                for (int j = 1; j <= time_delay + 1; j++)
+                {
+                    previous_time = current_time;
+                    while (current_time == previous_time)
+                    {
+                        time(&current_time);
+                    }
+                }
+                //Send request data command.
+                *(data_command + 0) = *((MEAS + i)->COMMAND + 0);
+                sendCommand(data_command);
+                //Check that the correct number of measurements are returned.
+                count = 0;
+                pos_resp = 0;
+                while (*(response + pos_resp) != '\0')
+                {
+                    if (*(response + pos_resp) == '+' || *(response + pos_resp) == '-')
+                    {
+                        count++;
+                    }
+                    pos_resp++;
+                }
+                //If the correct number of measurements are returned, parse and save.
+                if (count >= (MEAS + i)->MEASUREMENT)
+                {
+                    //Find measurement.
+                    pos_resp = 0;
+                    for (int j = 1; j <= (MEAS + i)->MEASUREMENT; j++)
+                    {
+                        while (*(response + pos_resp) != '+' && *(response + pos_resp) != '-')
+                        {
+                            pos_resp++;
+                        }
+                        if ((*(response + pos_resp) == '+' || *(response + pos_resp) == '-') &&
+                                j < (MEAS + i)->MEASUREMENT)
+                        {
+                            pos_resp++;
+                        }
+                    }
+                    //Save measurement.
+                    pos_val = 0;
+                    if (*(response + pos_resp) == '-')
+                    {
+                        *((MEAS + i)->value + pos_val) = *(response + pos_resp);
+                        pos_val++;
+                    }
+                    pos_resp++;
+                    while (*(response + pos_resp) != '+' && *(response + pos_resp) != '-' &&
+                            *(response + pos_resp) != '\0')
+                    {
+                        *((MEAS + i)->value + pos_val) = *(response + pos_resp);
+                        pos_resp++;
+                        pos_val++;
+                    }
+                    //Request write to file.
+                    write = 1;
+                }
+                //Reset flag.
+                (MEAS + i)->flag = 0;
             }
         }
         //Write to file if any measurements were taken.
@@ -61,7 +142,10 @@ void run()
             //Reset measurement values.
             for (int i = 0; i <= num - 1; i++)
             {
-                (MEAS + i)->value = "";
+                for (int j = 0; j <= 20; j++)
+                {
+                    *((MEAS + i)->value + j) = '\0';
+                }
             }
         }
     }
@@ -104,7 +188,8 @@ int main(int argc, char **argv)
             setFormat(*(argv + 3));
             break;
         case 10:
-            printResponse(*(argv + 2));
+            sendCommand(*(argv + 2));
+            printf("%s\n", response);
             break;
         case 11:
             setPrepend(*(argv + 3));

@@ -18,11 +18,14 @@ struct measurement
     time_t interval; //Same as above, but in seconds
     char *START;     //Start time which interval is measured from
     time_t start;    //Same as above, but in seconds
-    char *value;     //Most recent measured value
+    char *value;     //Most recent measured value; 20 characters
+    int flag;        //Flag marking measurement that needs to be taken.
 };
 
 //Array to store measurement settings
 struct measurement *MEAS;
+//String to store SDI-12 command responses.
+char *response;
 //Data settings
 char *site_name;     //Name of site; 20 characters
 char *data_path;     //Filepath to store data; 30 characters

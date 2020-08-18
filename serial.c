@@ -174,15 +174,12 @@ int openPort()
 }
 
 //Send an SDI-12 command and return the response.
-char *getResponse(char *command)
+void sendCommand(char *command)
 {
-    //Create string to store response.
-    char *response = (char *) calloc(256, sizeof(char));
     //Attept to open serial port, and return if there are any errors.
     if (openPort() == -1)
     {
-        *response = '\0';
-        return response;
+        return;
     }
     //Copy command into a new string, with prepended and appended characters.
     int length = strlen(prepend) + strlen(command) + strlen(append);
@@ -209,38 +206,24 @@ char *getResponse(char *command)
     {
         write(port, (string + i), 1);
     }
+    //Free command string.
+    free(string);
     //Skip input characters as set by user.
     char c;
     for (int i = 1; i <= skip; i++)
     {
         read(port, &c, 1);
     }
-    //Save response in string.
+    //Save response.
+    free(response);
+    response = (char *) calloc(256, sizeof(char));
     pos = 0;
-    while (read(port, &c, 1) && c != 13 && pos <= 200)
+    while (read(port, &c, 1) && c != 13 && pos <= 255)
     {
         *(response + pos) = c;
         pos++;
     }
     *(response + pos) = '\0';
-    //Free command string.
-    free(string);
     //Close serial port.
     close(port);
-    //Return the string.
-    return response;
-}
-
-//Print the response to an SDI-12 command.
-void printResponse(char *command)
-{
-    char *response = getResponse(command);
-    if (strlen(response) < 1)
-    {
-        printf("No response.\n");
-    }
-    else
-    {
-        printf("%s\n", response);
-    }
 }

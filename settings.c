@@ -190,7 +190,13 @@ void load()
         (MEAS + i)->start += (*((MEAS + i)->START + 6) - 48) * 10;
         (MEAS + i)->start += (*((MEAS + i)->START + 7) - 48) * 1;
         //value
-        (MEAS + i)->value = "";
+        (MEAS + i)->value = (char *) calloc(21, sizeof(char));
+        for (int j = 0; j <= 20; j++)
+        {
+            *((MEAS + i)->value + j) = '\0';
+        }
+        //flag
+        (MEAS + i)->flag = 0;
     }
     fclose(settings_file);
 }

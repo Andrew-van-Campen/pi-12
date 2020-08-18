@@ -209,6 +209,12 @@ int command(int argc, char **argv)
                     settingError();
                     return 0;
                 }
+                //Must end in 0.
+                if (*(*(argv + 4) + 7) - 48 != 0)
+                {
+                    settingError();
+                    return 0;
+                }
                 //If the above checks are passed, return 4.
                 return 4;
             }
