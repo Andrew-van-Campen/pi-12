@@ -199,6 +199,9 @@ void load()
         (MEAS + i)->flag = 0;
     }
     fclose(settings_file);
+    //Initialize SDI-12 response string.
+    response = (char *) calloc(101, sizeof(char));
+    *response = '\0';
 }
 
 //Save settings to file.

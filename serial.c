@@ -26,7 +26,7 @@ int openPort()
     }
     //Allocate memory for termios structure.
     tty = (struct termios *) malloc(sizeof(struct termios));
-    //Get current serial configuration.
+    //Get current serial configuration, and handle any errors.
     if (tcgetattr(port, tty) == -1)
     {
         printf("ERROR: %s.\n", strerror(errno));
@@ -214,11 +214,14 @@ void sendCommand(char *command)
     {
         read(port, &c, 1);
     }
-    //Save response.
-    free(response);
-    response = (char *) calloc(256, sizeof(char));
+    //Reset response string.
+    for (int i = 0; i <= 100; i++)
+    {
+        *(response + i) = '\0';
+    }
+    //Save response in response string.
     pos = 0;
-    while (read(port, &c, 1) && c != 13 && pos <= 255)
+    while (read(port, &c, 1) && c != 13 && pos <= 99)
     {
         *(response + pos) = c;
         pos++;
