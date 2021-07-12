@@ -10,6 +10,36 @@
 //Main program.
 void run()
 {
+    //Check if there is a currently running pi-12 program.
+    system("ps -A | grep pi-12 > .pi-12-test");
+    FILE *test = fopen(".pi-12-test", "r");
+    if (test == NULL)
+    {
+        printf("ERROR: Could not check for currently running Pi-12 programs.\n");
+        return;
+    }
+    char *test_string = (char *) calloc(100, sizeof(char));
+    int pos_test = 0;
+    char current_char = fgetc(test);
+    while (current_char != EOF)
+    {
+        *(test_string + pos_test) = current_char;
+        pos_test++;
+        current_char = fgetc(test);
+    }
+    fclose(test);
+    system("rm .pi-12-test");
+    if (pos_test > 30)
+    {
+        char *pid = (char *) calloc(10, sizeof(char));
+        for (int i = 0; *(test_string + i) != ' '; i++)
+        {
+            *(pid + i) = *(test_string + i);
+        }
+        int pid_num = atoi(pid);
+        printf("\nERROR: There is a Pi-12 program already running (PID %d).\n", pid_num);
+        return;
+    }
     //Get current time.
     time(&current_time);
     time_info = localtime(&current_time);
